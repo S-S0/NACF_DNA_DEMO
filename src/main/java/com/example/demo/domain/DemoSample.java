@@ -1,16 +1,14 @@
 package com.example.demo.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Data
 @Table(name = "sample")
-@Getter
-@Setter
+@Access(AccessType.FIELD)
 public class DemoSample {
     @Id
     private String eno;
