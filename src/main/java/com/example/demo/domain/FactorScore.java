@@ -1,26 +1,55 @@
 package com.example.demo.domain;
 
-import jakarta.persistence.*;
-import lombok.Data;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Entity
-@Data
 @Table(name = "factor_score")
-@Access(AccessType.FIELD)
 public class FactorScore {
+
     @Id
-    @Column(nullable = false, length = 6)
+    @Column(name = "brc", length = 6, nullable = false,
+            columnDefinition = "VARCHAR(6) COMMENT '사무소코드'")
     private String brc;
 
-    private Integer f_vol;
+    @Column(name = "brnm", length = 50, nullable = false,
+            columnDefinition = "VARCHAR(50) COMMENT '사무소명'")
+    private String brnm;
 
-    private Integer f_value;
+    @Column(name = "basyy", length = 4, nullable = false,
+            columnDefinition = "CHAR(4) COMMENT '기준년도'")
+    private String basyy;
 
-    private Integer f_size;
+    @Column(name = "volatility", nullable = false,
+            columnDefinition = "TINYINT COMMENT '변동성 점수 (0~100)'")
+    private Integer volatility;
 
-    private Integer f_mmt;
+    @Column(name = "value_factor", nullable = false,
+            columnDefinition = "TINYINT COMMENT '밸류 점수 (0~100)'")
+    private Integer valueFactor;
 
-    private Integer f_beta;
+    @Column(name = "size_factor", nullable = false,
+            columnDefinition = "TINYINT COMMENT '사이즈 점수 (0~100)'")
+    private Integer sizeFactor;
 
-    private Integer f_outlook;
+    @Column(name = "momentum", nullable = false,
+            columnDefinition = "TINYINT COMMENT '모멘텀 점수 (0~100)'")
+    private Integer momentum;
+
+    @Column(name = "beta", nullable = false,
+            columnDefinition = "TINYINT COMMENT '베타 점수 (0~100)'")
+    private Integer beta;
+
+    @Column(name = "outlook", nullable = false,
+            columnDefinition = "TINYINT COMMENT '전망치 점수 (0~100)'")
+    private Integer outlook;
+
+    public FactorScore() {
+    }
 }
