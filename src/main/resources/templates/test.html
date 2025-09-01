@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <!-- 개별로 -->
+    <h1 th:text="${eno}">사번</h1>
+    <h1 th:text="${empnm}">이름</h1>
+    <h1 th:text="${brc}">사무소코드</h1>
+    <h1 th:text="${brnm}">사무소명</h1>
+
+    <!-- 통채로 -->
+    <h1 th:text="${sample.eno}">사번</h1>
+    <h1 th:text="${sample.empnm}">이름</h1>
+    <h1 th:text="${sample.brc}">사무소코드</h1>
+    <h1 th:text="${sample.brnm}">사무소명</h1>
+
+    <img height="110" width="100" th:src="@{/img/nh_symbol.gif}" src="/img/nh_symbol.gif" alt="NH 로고" loading="lazy">
+</body>
+</html>
