@@ -50,14 +50,14 @@ public class DemoController {
         return "pg_1";
     }
     // ------------------------------------------------------------------
-    // 첫페이지
+    // 두번째페이지
     @RequestMapping(method = RequestMethod.GET, path = "/pg_2")
     public String pg_2(Model model) {
 
         return "pg_2";
     }
     // ------------------------------------------------------------------
-    // 첫페이지
+    // 세번째페이지
     @RequestMapping(method = RequestMethod.GET, path = "/pg_3")
     public String pg_3(Model model) {
 

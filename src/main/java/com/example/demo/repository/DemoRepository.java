@@ -17,7 +17,8 @@ public class DemoRepository {
     public DemoRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
     }
-// Spring JDBC 사용
+
+    // Spring JDBC 사용 테스트용
     public DemoSample findByEno(String eno) {
         Map<String, ?> params = Collections.singletonMap("eno", eno);
 
