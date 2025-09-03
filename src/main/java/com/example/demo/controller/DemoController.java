@@ -21,6 +21,11 @@ public class DemoController {
     public String home() {
         return "home";
     }
+    // 웹 페이지 개발용----------------------------------------------------
+    @RequestMapping(method = RequestMethod.GET, path = "/temp")
+    public String temp() {
+        return "temp";
+    }
     // ------------------------------------------------------------------
     // 정상접속 테스트용
     @RequestMapping(method = RequestMethod.GET, path = "/test")
@@ -36,5 +41,26 @@ public class DemoController {
         // DTO 통채로 붙이는 방법
         model.addAttribute("sample", sample);
         return "test";
+    }
+    // ------------------------------------------------------------------
+    // 첫페이지
+    @RequestMapping(method = RequestMethod.GET, path = "/pg_1")
+    public String pg_1(Model model) {
+
+        return "pg_1";
+    }
+    // ------------------------------------------------------------------
+    // 첫페이지
+    @RequestMapping(method = RequestMethod.GET, path = "/pg_2")
+    public String pg_2(Model model) {
+
+        return "pg_2";
+    }
+    // ------------------------------------------------------------------
+    // 첫페이지
+    @RequestMapping(method = RequestMethod.GET, path = "/pg_3")
+    public String pg_3(Model model) {
+
+        return "pg_3";
     }
 }
