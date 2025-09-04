@@ -199,6 +199,11 @@
 <footer>© <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> 재무 대시보드</footer>
 <div class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
+
+
+
+
+
 <!-- Inline App Script -->
 <script th:inline="javascript">
     /* ===== Bootstrap Tooltip ===== */
@@ -216,8 +221,8 @@
     })();
 
     /* ===== Data from server (with fallbacks) ===== */
-    const YEARS = /*[[${years}]]*/ ["FY2021","FY2022","FY2023","FY2024","FY2025"];
-    const CANDLES = /*[[${candles}]]*/ [
+    const YEARS = /*[[${years}]]*/ ["FY2021","FY2022","FY2023","FY2024","FY2025"]; //To-Do 연도 불러오기-차트 하단의 연도표시
+    const CANDLES = /*[[${candles}]]*/ [ //To-Do 아래 형식대로 데이터 불러오기
         {time:'2024-06-10',open:22150,high:22400,low:22000,close:22280},
         {time:'2024-06-11',open:22280,high:22550,low:22200,close:22490},
         {time:'2024-06-12',open:22490,high:22620,low:22350,close:22580},
@@ -259,7 +264,7 @@
         {time:'2024-08-01',open:23210,high:23300,low:23020,close:23110},
         {time:'2024-08-02',open:23110,high:23220,low:22950,close:23020}
     ];
-    const FACTOR = /*[[${factorScores}]]*/ [70,55,90,40,85,60];
+    const FACTOR = /*[[${factorScores}]]*/ [70,55,90,40,85,60]; //To-Do 팩터점수 6개
 
     /* ===== Candlestick (Lightweight) + Outlook (Chart.js) ===== */
     (function(){
@@ -295,7 +300,7 @@
         const nf = new Intl.NumberFormat('ko-KR');
 
         const lastClose = CANDLES[CANDLES.length-1].close;
-        const target = { max: 36000, avg: 29875, min: 21000 };
+        const target = { max: 36000, avg: 29875, min: 21000 }; //To-Do 전망치
         const history = CANDLES.map(d=>d.close);
         const labels  = CANDLES.map(d=>d.time).concat(['12개월 후']);
         const histData = history.concat([null]);
@@ -340,14 +345,14 @@
                     ctx.fillStyle = color; ctx.fillText(text, bx+padX, by+boxH/1.5);
                 }
                 const p = (v)=>{ const diff=v-lastClose; const sign = diff>0? '+':'-'; return `${diff===0?'±':sign}${Math.abs(diff/lastClose*100).toFixed(2)}%  ₩${nf.format(v)}`; };
-                drawTag(target.max, `최고 ${p(target.max)}`, '#198754');
-                drawTag(target.avg, `평균 ${p(target.avg)}`, '#198754');
-                drawTag(target.min, `최저 ${p(target.min)}`, '#dc3545');
+                drawTag(target.max, `최고 ${p(target.max)}`, '#198754'); //To-Do
+                drawTag(target.avg, `평균 ${p(target.avg)}`, '#198754'); //To-Do
+                drawTag(target.min, `최저 ${p(target.min)}`, '#dc3545'); //To-Do
 
                 const xNow = x.getPixelForValue(labels.length-2);
                 const yNow = y.getPixelForValue(lastClose);
                 ctx.fillStyle = '#212529'; ctx.beginPath(); ctx.arc(xNow, yNow, 4, 0, Math.PI*2); ctx.fill();
-                const nowText = `현재가 ₩${nf.format(lastClose)}`;
+                const nowText = `현재가 ₩${nf.format(lastClose)}`; //To-Do
                 const m = ctx.measureText(nowText); const w=m.width + 16, h=20; const rx=6;
                 const nx = Math.max(Math.min(xNow - w - 8, chart.width - w - 4), 8);
                 const ny = Math.min(Math.max(yNow - h/2, top + 2), bottom - h - 2);
@@ -554,7 +559,7 @@
     /* ===== Support Charts (Sales Mix / Profit Rate / Growth) ===== */
     (function(){
         const nf = new Intl.NumberFormat('ko-KR');
-        const years=['2022','2023','2024'];
+        const years=['2022','2023','2024']; //To-Do
 
         function toPctStacks(stacks){
             const totals = years.map((_,i)=> stacks.reduce((s,st)=>s+(st.data[i]||0),0));

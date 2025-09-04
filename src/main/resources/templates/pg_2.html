@@ -75,13 +75,16 @@
 </header>
 
 <div class="body-header container-fluid d-flex align-items-center flex-wrap">
-    <label class="form-label mb-0 fw-bold" for="officeCode">사무소코드</label>
-    <input id="officeCode" type="number" inputmode="numeric" pattern="[0-9]*" maxlength="6"
-           class="form-control form-control-sm" placeholder="6자리 숫자" style="max-width:150px"
-           aria-describedby="officeHelp"
-           oninput="if(this.value.length>6)this.value=this.value.slice(0,6);">
-    <small id="officeHelp" class="text-muted ms-1">숫자 6자리</small>
-    <button class="btn btn-sm btn-primary" type="button">확인</button>
+    <form class="d-flex gap-2" th:action="@{/pg_2}" method="get">
+        <label class="form-label mb-0 fw-bold" for="officeCode">사무소코드</label>
+        <input id="officeCode" name="brc" type="number" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+               class="form-control form-control-sm"
+               placeholder="6자리 숫자" style="max-width:150px"
+               aria-describedby="officeHelp"
+               oninput="if(this.value.length>6)this.value=this.value.slice(0,6);">
+        <small id="officeHelp" class="text-muted ms-1">숫자 6자리</small>
+        <button class="btn btn-sm btn-primary" type="submit">확인</button>
+    </form>
 </div>
 
 <main class="container-fluid py-2">
@@ -115,44 +118,163 @@
                         <tr>
                             <th style="width:180px">지표 분류</th>
                             <th>지표</th>
-                            <th>FY2021</th>
-                            <th>FY2022</th>
-                            <th>FY2023</th>
-                            <th>FY2024</th>
-                            <th>FY2025</th>
+                            <th th:each="y : ${years}" th:text="${y + '년'}">2020년</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr><td rowspan="8">수익성 비율</td><td>순이자마진(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>세전순이익률(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>순이익률(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>자기자본이익률(%) - ROE</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>증분 자기자본이익률(%) - 1Y,3Y,5Y</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>총자산순이익률(%) - ROA</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>영업현금흐름전환비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>자산효율성비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="4">운영효율성 비율</td><td>효율성비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>총자산회전율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>금융자산회전율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>영업레버리지비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="3">자산건전성 비율</td><td>보통주자본(CET1)비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>기본자본(Tier1)비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>총자본비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="3">기타 재무비율</td><td>Tier1레버리지비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>예대율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>유동성커버리지비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="2">신용 비율</td><td>총여신대비부실채권 비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>총여신대비대손충당금 비율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="2">이자율</td><td>예수부채이자율(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>총여신대비이자및수수료(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="3">기타</td><td>피오트로스키 F-스코어</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>베네시 M-스코어</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>G-스코어</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="2">주주환원 수익률</td><td>배당수익률(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>총 수익률(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td rowspan="2">주주환원 성향</td><td>배당성향(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-                        <tr><td>수정배당성향(%)</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                        <!-- ========== 수익성 비율 ========== -->
+                        <tr>
+                            <td rowspan="10">수익성 비율</td>
+                            <td>순이자마진(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.netInterestMarginPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>세전순이익률(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.preTaxProfitMarginPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>순이익률(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.netProfitMarginPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>자기자본이익률(%) - ROE</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.returnOnEquityRoePct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>증분 자기자본이익률(%) - 1Y</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.incrementalRoe1yPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>증분 자기자본이익률(%) - 3Y</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.incrementalRoe3yPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>증분 자기자본이익률(%) - 5Y</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.incrementalRoe5yPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>총자산순이익률(%) - ROA</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.returnOnAssetsRoaPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>영업현금흐름전환비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.operatingCfConversionRatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>자산효율성비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.assetEfficiencyRatioPct) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 운영효율성 비율 ========== -->
+                        <tr>
+                            <td rowspan="4">운영효율성 비율</td>
+                            <td>효율성비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.efficiencyRatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>총자산회전율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.totalAssetTurnoverPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>금융자산회전율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.financialAssetTurnoverPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>영업레버리지비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.operatingLeverageRatioPct) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 자산건전성 비율 ========== -->
+                        <tr>
+                            <td rowspan="3">자산건전성 비율</td>
+                            <td>보통주자본(CET1)비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.cet1RatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>기본자본(Tier1)비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.tier1RatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>총자본비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.totalCapitalRatioPct) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 기타 재무비율 ========== -->
+                        <tr>
+                            <td rowspan="3">기타 재무비율</td>
+                            <td>Tier1레버리지비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.tier1LeverageRatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>예대율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.loanToDepositRatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>유동성커버리지비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.liquidityCoverageRatioPct) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 신용 비율 ========== -->
+                        <tr>
+                            <td rowspan="2">신용 비율</td>
+                            <td>총여신대비부실채권 비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.nplRatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>총여신대비대손충당금 비율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.loanLossReserveRatioPct) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 이자율 ========== -->
+                        <tr>
+                            <td rowspan="2">이자율</td>
+                            <td>예수부채이자율(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.depositInterestRatePct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>총여신대비이자및수수료(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.interestFeeToLoanRatioPct) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 기타(스코어) ========== -->
+                        <tr>
+                            <td rowspan="3">기타</td>
+                            <td>피오트로스키 F-스코어</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.piotroskiFScore) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>베네시 M-스코어</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.beneishMScore) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>G-스코어</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.gScore) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 주주환원 수익률 ========== -->
+                        <tr>
+                            <td rowspan="2">주주환원 수익률</td>
+                            <td>배당수익률(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.dividendYieldPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>총 수익률(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.totalReturnPct) ?: '—'}">—</td>
+                        </tr>
+
+                        <!-- ========== 주주환원 성향 ========== -->
+                        <tr>
+                            <td rowspan="2">주주환원 성향</td>
+                            <td>배당성향(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.dividendPayoutRatioPct) ?: '—'}">—</td>
+                        </tr>
+                        <tr>
+                            <td>수정배당성향(%)</td>
+                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.adjustedPayoutRatioPct) ?: '—'}">—</td>
+                        </tr>
+
                         </tbody>
+
                     </table>
                 </div>
             </div>

@@ -1,19 +1,30 @@
 package com.example.demo.controller;
 
 import com.example.demo.domain.DemoSample;
+import com.example.demo.domain.FinancialRatios;
 import com.example.demo.service.DemoService;
+import com.example.demo.service.FinancialRatiosService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 @Slf4j
 public class DemoController {
     private final DemoService demoService;
-    public DemoController(DemoService demoService) {
+    private final FinancialRatiosService service;
+    public DemoController(DemoService demoService, FinancialRatiosService service) {
         this.demoService = demoService;
+        this.service = service;
     }
 
     // 여기가 메인페이지----------------------------------------------------
@@ -50,11 +61,24 @@ public class DemoController {
         return "pg_1";
     }
     // ------------------------------------------------------------------
-    // 두번째페이지
-    @RequestMapping(method = RequestMethod.GET, path = "/pg_2")
-    public String pg_2(Model model) {
+//    // 두번째페이지
+    @GetMapping("/pg_2")
+    public String showPg2(@RequestParam(name="brc", required=false) String brc, Model model) {
+        // 연도 목록
+        List<String> years = Arrays.asList("2020","2021","2022","2023","2024");
 
-        return "pg_2";
+        if (brc != null && !brc.isEmpty()) {
+            Map<String, FinancialRatios> fr = service.getRatiosForYears(brc, years);
+            model.addAttribute("fr", fr);
+        } else {
+            model.addAttribute("fr", Collections.emptyMap());
+        }
+
+        model.addAttribute("years", years);
+        model.addAttribute("pageTitle", "재무 대시보드");
+        model.addAttribute("corp", Map.of("name",(brc != null ? brc : "") + "농협")); // 사무소코드별 이름 정해야함
+
+        return "pg_2"; // templates/pg_2.html
     }
     // ------------------------------------------------------------------
     // 세번째페이지
