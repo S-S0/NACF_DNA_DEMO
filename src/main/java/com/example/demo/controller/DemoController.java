@@ -30,9 +30,13 @@ public class DemoController {
     @RequestMapping(method = RequestMethod.GET, path = "/")
     public String home(@RequestParam(name="brc", required=false) String brc, Model model) {
 
+        // 페이지 타이틀
+        model.addAttribute("pageTitle", "우리농축협 손익위험예측 및 경영전략 생성 시스템");
+
+        // 사무소코드가 없을 경우 기본 방어로직 - 안동농협?
         if(brc == null) {
             brc = "707015";
-        } // 사무소코드가 없을 경우 기본 방어로직 - 안동농협?
+        }
 
         // 첫번째 탭 모델 ------------------------------------------------------------------
         List<FactorScore> fs = demoService.factorByBrc(brc);
@@ -68,7 +72,6 @@ public class DemoController {
         }
 
         model.addAttribute("years", years);
-        model.addAttribute("pageTitle", "재무 대시보드");
         model.addAttribute("corp", Map.of("name", brc + "농협")); // 사무소코드별 이름 정해야함
 
         // 세번째 탭 모델 ------------------------------------------------------------------
