@@ -1215,12 +1215,26 @@
             avg: mids.length ? Math.round(mids.reduce((a, b) => a + b, 0) / mids.length) : lastClose
         };
         const history = hasCandles ? CANDLES.map(d => d.close) : [lastClose];
-        const labels = (hasCandles ? CANDLES.map(d => d.time) : ['현재']).concat(['12개월 후']);
-        const histData = history.concat([null]);
-        const baseGap = new Array(history.length - 1).fill(null);
-        const projMax = baseGap.concat([lastClose, target.max]);
-        const projAvg = baseGap.concat([lastClose, target.avg]);
-        const projMin = baseGap.concat([lastClose, target.min]);
+
+        // ▶▶ 여기 추가: 미래 더미 칸(예: 8칸).
+        const FUTURE_STEPS = 8;
+
+        // 라벨: 과거 날짜들 + 빈칸(FUTURE_STEPS) + "12개월 후"
+        const labels = (hasCandles ? CANDLES.map(d=>d.time) : ['현재'])
+            .concat(Array(FUTURE_STEPS).fill(''))
+            .concat(['12개월 후']);
+        const nowIndex = history.length - 1;
+        const endIndex = labels.length - 1;
+        const histData = history.concat(Array(FUTURE_STEPS + 1).fill(null));
+        const projAt = (targetVal) => {
+            const arr = new Array(labels.length).fill(null);
+            arr[nowIndex] = lastClose;   // 현재
+            arr[endIndex] = targetVal;   // 12개월 후
+            return arr;
+        };
+        const projMax = projAt(target.max);
+        const projAvg = projAt(target.avg);
+        const projMin = projAt(target.min);
 
         const allVals = history.concat([target.min, target.max]);
         const yMin = Math.min(...allVals);
@@ -1248,7 +1262,7 @@
                 }
 
                 function drawTag(yVal, text, color) {
-                    const xEnd = x.getPixelForValue(endIndex);
+                    const xEnd = x.getPixelForValue(nowIndex);
                     const yEnd = y.getPixelForValue(yVal);
                     const padX = 8;
                     ctx.font = '12px system-ui,-apple-system,Segoe UI,Roboto';
@@ -1276,7 +1290,7 @@
                 drawTag(target.avg, `평균 ${fmt(target.avg)}`, '#198754');
                 drawTag(target.min, `최저 ${fmt(target.min)}`, '#dc3545');
 
-                const xNow = x.getPixelForValue(labels.length - 2);
+                const xNow = x.getPixelForValue(nowIndex);
                 const yNow = y.getPixelForValue(lastClose);
                 ctx.fillStyle = '#212529';
                 ctx.beginPath();
@@ -1318,19 +1332,19 @@
                     {
                         label: '최고', data: projMax, borderColor: '#198754',
                         borderDash: [6, 6],
-                        pointRadius: (c) => (c.dataIndex >= labels.length - 2 ? 3 : 0),
+                        pointRadius: (c) => (c.dataIndex === nowIndex || c.dataIndex === endIndex ? 3 : 0),
                         pointBackgroundColor: '#198754', tension: .15, spanGaps: true
                     },
                     {
                         label: '평균', data: projAvg, borderColor: '#20c997',
                         borderDash: [6, 6],
-                        pointRadius: (c) => (c.dataIndex >= labels.length - 2 ? 3 : 0),
+                        pointRadius: (c) => (c.dataIndex === nowIndex || c.dataIndex === endIndex ? 3 : 0),
                         pointBackgroundColor: '#20c997', tension: .15, spanGaps: true
                     },
                     {
                         label: '최저', data: projMin, borderColor: '#dc3545',
                         borderDash: [6, 6],
-                        pointRadius: (c) => (c.dataIndex >= labels.length - 2 ? 3 : 0),
+                        pointRadius: (c) => (c.dataIndex === nowIndex || c.dataIndex === endIndex ? 3 : 0),
                         pointBackgroundColor: '#dc3545', tension: .15, spanGaps: true
                     }
                 ]
@@ -1348,7 +1362,7 @@
                 },
                 layout: {padding: {right: 160}},
                 scales: {
-                    x: {grid: {display: false}, ticks: {maxRotation: 0, autoSkip: true}},
+                    x: {type: 'category',offset: true,grid: {display: false}, ticks: {maxRotation: 0, autoSkip: true, callback: (value, idx) => labels[idx] || ''}},
                     y: {min: yMin - pad, max: yMax + pad, ticks: {callback: v => '₩' + nf.format(v)}}
                 }
             }
@@ -1392,7 +1406,6 @@
     (function () {
         const nf = new Intl.NumberFormat('ko-KR');
         const years = ['2022', '2023', '2024']; //To-Do
-        const UNIT = 1000000; // 1백만 단위
 
         const INCOMES = /*[[${incomePrices}]]*/ [];
         console.log("INCOMES", INCOMES);  // 배열이면 OK
