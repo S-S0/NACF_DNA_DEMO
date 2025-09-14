@@ -32,7 +32,7 @@ public class DemoController {
 
         if(brc == null) {
             brc = "707015";
-        } // 사무소코드가 없을 경우 기본 방어로직
+        } // 사무소코드가 없을 경우 기본 방어로직 - 안동농협?
 
         List<FactorScore> fs = demoService.factorByBrc(brc);
         model.addAttribute("factorScores", fs);
@@ -59,7 +59,7 @@ public class DemoController {
         // 연도 목록
         List<String> years = Arrays.asList("2020","2021","2022","2023","2024");
 
-        if (brc != null && !brc.isEmpty()) {
+        if (!brc.isEmpty()) {
             Map<String, FinancialRatios> fr = service.getRatiosForYears(brc, years);
             model.addAttribute("fr", fr);
         } else {
@@ -68,14 +68,10 @@ public class DemoController {
 
         model.addAttribute("years", years);
         model.addAttribute("pageTitle", "재무 대시보드");
-        model.addAttribute("corp", Map.of("name",(brc != null ? brc : "") + "농협")); // 사무소코드별 이름 정해야함
+        model.addAttribute("corp", Map.of("name", brc + "농협")); // 사무소코드별 이름 정해야함
 
         return "home";
     }
-
-
-
-
 
     // 웹 페이지 개발용----------------------------------------------------
     @RequestMapping(method = RequestMethod.GET, path = "/temp")
@@ -99,58 +95,20 @@ public class DemoController {
         return "test";
     }
 
-
-
-    // ------------------------------------------------------------------
-    // 첫페이지 테스트
-    @RequestMapping(method = RequestMethod.GET, path = "/pg_1")
-    public String pg_1(Model model) {
-        List<FactorScore> fs = demoService.factorByBrc("707015");
-        model.addAttribute("factorScores", fs);
-
-        List<StockPrice> sp = demoService.priceByBrc("707015");
-        model.addAttribute("stockPrices", sp);
-
-        List<StockOutlook> so = demoService.outlookByBrc("707015");
-        model.addAttribute("stockOutlooks", so);
-
-        List<OfficeFinancials> icp = demoService. incomeByBrc("707015");
-        model.addAttribute("incomePrices", icp);
-
-        List<OfficeFinancials> pm = demoService. profitByBrc("707015");
-        model.addAttribute("profitMargins", pm);
-
-        List<OfficeFinancials> pg = demoService. progrowthByBRC("707015");
-        model.addAttribute("profitGrowths", pg);
-
-        List<BrcInfo> db = demoService. descByBRC("707015");
-        model.addAttribute("brcInfos", db);
-        return "pg_1";
-    }
-    // ------------------------------------------------------------------
-    // 두번째페이지 테스트
-    @GetMapping("/pg_2")
-    public String showPg2(@RequestParam(name="brc", required=false) String brc, Model model) {
-        // 연도 목록
-        List<String> years = Arrays.asList("2020","2021","2022","2023","2024");
-
-        if (brc != null && !brc.isEmpty()) {
-            Map<String, FinancialRatios> fr = service.getRatiosForYears(brc, years);
-            model.addAttribute("fr", fr);
-        } else {
-            model.addAttribute("fr", Collections.emptyMap());
-        }
-
-        model.addAttribute("years", years);
-        model.addAttribute("pageTitle", "재무 대시보드");
-        model.addAttribute("corp", Map.of("name",(brc != null ? brc : "") + "농협")); // 사무소코드별 이름 정해야함
-
-        return "pg_2"; // templates/pg_2.html
-    }
     // ------------------------------------------------------------------
     // 세번째페이지 테스트
     @RequestMapping(method = RequestMethod.GET, path = "/pg_3")
     public String pg_3(Model model) {
+
+        /* !!핵심지표 5개 바인딩할때 사용하시면 됩니다.!!
+        model.addAttribute("valuation", Map.of(
+                "per",         perValue,         // Double
+                "pbr",         pbrValue,         // Double
+                "evToSales",   evSalesValue,     // Double
+                "evToEbitda",  evEbitdaValue,    // Double
+                "evToEbit",    evEbitValue       // Double
+        ));
+        */
 
         return "pg_3";
     }
