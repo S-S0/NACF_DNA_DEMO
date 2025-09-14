@@ -5,10 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.time.LocalDate;
 import java.math.BigDecimal;
 
 @Entity
@@ -160,6 +157,58 @@ public class OfficeFinancials {
     @Column(name = "executive_name", length = 30, nullable = false,
             columnDefinition = "VARCHAR(30) COMMENT '상임이사'")
     private String executiveName;
+
+    @Column(name = "common_dividend_ratio2", precision = 5, scale = 2, nullable = false,
+            columnDefinition = "DECIMAL(5,2) COMMENT '보통출자배당률(%)'")
+    private BigDecimal commonDividendRatio2;
+
+    @Column(name = "net_income_growth_ratio3", precision = 5, scale = 2, nullable = false,
+            columnDefinition = "DECIMAL(5,2) COMMENT '당기순이익성장률(%)'")
+    private BigDecimal netIncomeGrowthRatio3;
+
+    @Column(name = "operating_revenue_growth_ratio3", precision = 5, scale = 2, nullable = false,
+            columnDefinition = "DECIMAL(5,2) COMMENT '영업수익성장률(%)'")
+    private BigDecimal operatingRevenueGrowthRatio3;
+
+    @Column(name = "non_operating_income_growth_ratio3", precision = 5, scale = 2, nullable = false,
+            columnDefinition = "DECIMAL(5,2) COMMENT '영업외수익성장률(%)'")
+    private BigDecimal nonOperatingIncomeGrowthRatio3;
+
+    @Column(name = "interest_income1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '이자수익'")
+    private Long interestIncome1;
+
+    @Column(name = "fee_income1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '수수료수익'")
+    private Long feeIncome1;
+
+    @Column(name = "other_operating_income1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '기타영업수익'")
+    private Long otherOperatingIncome1;
+
+    @Column(name = "economic_operating_income1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '경제사업영업수익'")
+    private Long economicOperatingIncome1;
+
+    @Column(name = "education_support_income1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '교육지원사업수익'")
+    private Long educationSupportIncome1;
+
+    @Column(name = "non_operating_income1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '영업외수익'")
+    private Long nonOperatingIncome1;
+
+    @Column(name = "net_profit_margin1", precision = 5, scale = 2, nullable = false,
+            columnDefinition = "DECIMAL(5,2) COMMENT '매출액대비당기순이익률(%)'")
+    private BigDecimal netProfitMargin1;
+
+    @Column(name = "revenue1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '매출액1'")
+    private Long revenue1;
+
+    @Column(name = "net_income1", nullable = false,
+            columnDefinition = "BIGINT COMMENT '당기순이익1'")
+    private Long netIncome1;
 
     public OfficeFinancials() {}
 }

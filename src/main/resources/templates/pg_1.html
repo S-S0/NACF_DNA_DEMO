@@ -92,7 +92,7 @@
             <li class="nav-item" role="presentation"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#profit" role="tab">손익/위험</button></li>
         </ul>
 
-        <div class="corp-name" th:text="${corp?.name} ?: 'XX농협'">XX농협</div>
+        <div class="corp-name" th:text="${brcInfos[0]?.brnm} ?: 'XX농협'"></div>
 
         <div class="tab-content mt-3">
             <!-- Main -->
@@ -113,8 +113,7 @@
                                 <div class="mt-3">
                                     <h2 class="h6 fw-bold mb-1">소개</h2>
                                     <hr class="mt-0 mb-2">
-                                    <p class="mb-0" style="font-size:0.9rem" th:text="${corp?.intro} ?: '여기에 회사 소개 글을 입력하세요.'">
-                                        여기에 회사 소개 글을 입력하세요.
+                                    <p class="mb-0" style="font-size:0.9rem" th:text="${brcInfos[0]?.description} ?: '여기에 회사 소개 글을 입력하세요.'">
                                     </p>
                                 </div>
                             </section>
@@ -199,11 +198,6 @@
 <footer>© <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> 재무 대시보드</footer>
 <div class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
-
-
-
-
-
 <!-- Inline App Script -->
 <script th:inline="javascript">
     /* ===== Bootstrap Tooltip ===== */
@@ -211,60 +205,85 @@
         document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(el){ new bootstrap.Tooltip(el); });
     })();
 
-    /* ===== Zoom plugin: register once (guarded) ===== */
+    /* ===== Zoom plugin: register once (robust) ===== */
     (function(){
-        if(!window.Chart) return;
-        const zp = window.ChartZoom || window["chartjs-plugin-zoom"];
-        if (!zp) return;
-        const already = Chart.registry?.plugins?.get?.('zoom') || Chart.registry?.plugins?.get?.('chartjs-plugin-zoom');
-        if (!already) { try { Chart.register(zp); } catch(e){} }
+        if (!window.Chart) return;
+        const zoom = window['chartjs-plugin-zoom'];
+        try { if (zoom) { Chart.register(zoom); } } catch(_) { /* already registered */ }
     })();
 
     /* ===== Data from server (with fallbacks) ===== */
-    const YEARS = /*[[${years}]]*/ ["FY2021","FY2022","FY2023","FY2024","FY2025"]; //To-Do 연도 불러오기-차트 하단의 연도표시
-    const CANDLES = /*[[${candles}]]*/ [ //To-Do 아래 형식대로 데이터 불러오기
-        {time:'2024-06-10',open:22150,high:22400,low:22000,close:22280},
-        {time:'2024-06-11',open:22280,high:22550,low:22200,close:22490},
-        {time:'2024-06-12',open:22490,high:22620,low:22350,close:22580},
-        {time:'2024-06-13',open:22580,high:22650,low:22380,close:22440},
-        {time:'2024-06-14',open:22440,high:22600,low:22300,close:22520},
-        {time:'2024-06-17',open:22520,high:22750,low:22450,close:22720},
-        {time:'2024-06-18',open:22720,high:22800,low:22580,close:22610},
-        {time:'2024-06-19',open:22610,high:22840,low:22590,close:22790},
-        {time:'2024-06-20',open:22790,high:22950,low:22700,close:22910},
-        {time:'2024-06-21',open:22910,high:22980,low:22680,close:22730},
-        {time:'2024-06-24',open:22730,high:22820,low:22550,close:22600},
-        {time:'2024-06-25',open:22600,high:22750,low:22480,close:22510},
-        {time:'2024-06-26',open:22510,high:22690,low:22450,close:22640},
-        {time:'2024-06-27',open:22640,high:22820,low:22620,close:22770},
-        {time:'2024-06-28',open:22770,high:22920,low:22700,close:22860},
-        {time:'2024-07-01',open:22860,high:23100,low:22780,close:23040},
-        {time:'2024-07-02',open:23040,high:23150,low:22880,close:22990},
-        {time:'2024-07-03',open:22990,high:23120,low:22900,close:23060},
-        {time:'2024-07-04',open:23060,high:23130,low:22850,close:22920},
-        {time:'2024-07-05',open:22920,high:23010,low:22740,close:22810},
-        {time:'2024-07-08',open:22810,high:22890,low:22580,close:22640},
-        {time:'2024-07-09',open:22640,high:22780,low:22530,close:22690},
-        {time:'2024-07-10',open:22690,high:22950,low:22640,close:22910},
-        {time:'2024-07-11',open:22910,high:23060,low:22820,close:23010},
-        {time:'2024-07-12',open:23010,high:23120,low:22920,close:23090},
-        {time:'2024-07-15',open:23090,high:23220,low:23010,close:23170},
-        {time:'2024-07-16',open:23170,high:23240,low:23020,close:23060},
-        {time:'2024-07-17',open:23060,high:23130,low:22920,close:22960},
-        {time:'2024-07-18',open:22960,high:23010,low:22800,close:22840},
-        {time:'2024-07-19',open:22840,high:22960,low:22710,close:22930},
-        {time:'2024-07-22',open:22930,high:23100,low:22850,close:23050},
-        {time:'2024-07-23',open:23050,high:23200,low:22980,close:23120},
-        {time:'2024-07-24',open:23120,high:23220,low:23010,close:23040},
-        {time:'2024-07-25',open:23040,high:23190,low:22950,close:22980},
-        {time:'2024-07-26',open:22980,high:23070,low:22800,close:22840},
-        {time:'2024-07-29',open:22840,high:23020,low:22790,close:22970},
-        {time:'2024-07-30',open:22970,high:23110,low:22900,close:23080},
-        {time:'2024-07-31',open:23080,high:23250,low:23010,close:23210},
-        {time:'2024-08-01',open:23210,high:23300,low:23020,close:23110},
-        {time:'2024-08-02',open:23110,high:23220,low:22950,close:23020}
-    ];
-    const FACTOR = /*[[${factorScores}]]*/ [70,55,90,40,85,60]; //To-Do 팩터점수 6개
+    const YEARS  = /*[[${years}]]*/ ["FY2021","FY2022","FY2023","FY2024","FY2025"];
+
+    /* FACTOR: 서버가 [숫자...] 또는 [{volatility,...}] 둘 다 줄 수 있어 통일 */
+    const _RAW_FACTOR = /*[[${factorScores}]]*/ [];
+    function normalizeFactor(raw){
+        if (!Array.isArray(raw) || raw.length === 0) return [0,0,0,0,0,0];
+        // 케이스1) [숫자, ...] 6개
+        if (typeof raw[0] === 'number') {
+            return (raw.length >= 6) ? raw.slice(0,6) : [...raw, ...Array(6-raw.length).fill(0)];
+        }
+        // 케이스2) [{ volatility,valueFactor,sizeFactor,momentum,beta,outlook }]
+        const o = raw[0] || {};
+        return [
+            +o.volatility   || 0,
+            +o.valueFactor  || 0,
+            +o.sizeFactor   || 0,
+            +o.momentum     || 0,
+            +o.beta         || 0,
+            +o.outlook      || 0
+        ];
+    }
+    const FACTOR_DATA = normalizeFactor(_RAW_FACTOR);
+
+    /* ===== Radar Chart for factor ===== */
+    (function(){
+        const canvas = document.getElementById('factorChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d'); if (!ctx) return;
+
+        new Chart(ctx, {
+            type:'radar',
+            data:{
+                labels:['변동성','밸류','사이즈','모멘텀','베타','전망치'],
+                datasets:[{
+                    label:'팩터 점수',
+                    data: FACTOR_DATA,
+                    backgroundColor:'rgba(54,162,235,0.2)',
+                    borderColor:'rgba(54,162,235,1)',
+                    pointBackgroundColor:'rgba(54,162,235,1)',
+                    pointRadius:3,
+                    fill:true,
+                    tension:0.25
+                }]
+            },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+                plugins:{ legend:{display:false} },
+                scales:{ r:{ beginAtZero:true, min:0, max:100, ticks:{stepSize:20}, angleLines:{color:'#eee'}, grid:{color:'#ddd'} } }
+            }
+        });
+    })();
+
+    // 주가
+    const STOCKS = /*[[${stockPrices}]]*/ [];
+
+    /* LightweightCharts에 맞게 변환 (YYYYMMDD → YYYY-MM-DD, 숫자 가드) */
+    const CANDLES = STOCKS.map(d => {
+        const s = String(d?.basDt ?? '');
+        const time = (s.length === 8) ? `${s.slice(0,4)}-${s.slice(4,6)}-${s.slice(6,8)}`
+            : (d?.basDt ?? '');
+        return {
+            time,
+            open : +d?.open  || 0,
+            high : +d?.high  || 0,
+            low  : +d?.low   || 0,
+            close: +d?.close || 0
+        };
+    });
+
+    // 전망치
 
     /* ===== Candlestick (Lightweight) + Outlook (Chart.js) ===== */
     (function(){
@@ -411,155 +430,15 @@
         [pctEl,absEl].forEach(el=>{ el.classList.remove('up','down','neutral'); el.classList.add(dir); });
     })();
 
-    /* ===== Ratio line chart & table interactions ===== */
-    (function(){
-        const ctx=document.getElementById('stockChart')?.getContext('2d'); if(!ctx) return;
-        const nf = new Intl.NumberFormat('ko-KR');
-
-        window._ratioChart=new Chart(ctx,{
-            type:'line',
-            data:{labels:YEARS,datasets:[]},
-            options:{
-                responsive:true,maintainAspectRatio:false,
-                animation: { duration: 250 },
-                plugins:{
-                    legend:{display:true},tooltip:{enabled:true},
-                    zoom:{pan:{enabled:true,mode:'x'},zoom:{wheel:{enabled:true},pinch:{enabled:true},mode:'x'}}
-                },
-                scales:{x:{title:{display:true,text:'회계연도'}},y:{position:'right',title:{display:true,text:'값 (%)'},beginAtZero:true,ticks:{callback:v=>v+'%'}}}
-            }
-        });
-
-        document.querySelector('[data-bs-target="#ratio"]')?.addEventListener('shown.bs.tab',()=>{ _ratioChart.resize(); });
-
-        const STORAGE={yearRange:'ratioYearRange', selected:'ratioSelectedMetrics'};
-        const randColor=()=>`rgb(${~~(Math.random()*255)},${~~(Math.random()*255)},${~~(Math.random()*255)})`;
-        const toast=(msg)=>{
-            const tc=document.querySelector('.toast-container');
-            const t=document.createElement('div');
-            t.className='toast align-items-center text-bg-primary border-0 show';
-            t.innerHTML=`<div class='d-flex'><div class='toast-body'>${msg}</div><button type='button' class='btn-close btn-close-white me-2 m-auto' data-bs-dismiss='toast'></button></div>`;
-            tc.appendChild(t);
-            setTimeout(()=>{t.classList.replace('show','hide');setTimeout(()=>t.remove(),300);},2000);
-        };
-        window.clearAll=()=>{_ratioChart.data.datasets=[];_ratioChart.update();localStorage.removeItem(STORAGE.selected);toast('모든 지표 제거');};
-
-        function getLabel(row){
-            const total = row.cells.length;
-            const hasGroup = (total === YEARS.length + 2);
-            const labelCell = hasGroup ? row.cells[1] : row.cells[0];
-            return (labelCell?.textContent || '').trim() || '지표';
-        }
-        function getValues(row){
-            const values=[]; const base=row.cells.length - YEARS.length;
-            for(let i=base;i<row.cells.length;i++){
-                const raw=row.cells[i].textContent.replace('%','').trim();
-                const num=parseFloat(raw); values.push(isNaN(num)?null:num);
-            }
-            return values;
-        }
-        function addDataset(label, data){
-            _ratioChart.data.datasets.push({label, data, borderColor:randColor(), backgroundColor:'rgba(0,0,0,0.08)', pointRadius:3, tension:.3});
-            _ratioChart.update();
-        }
-        function removeDataset(label){
-            const idx=_ratioChart.data.datasets.findIndex(d=>d.label===label);
-            if(idx!==-1){ _ratioChart.data.datasets.splice(idx,1); _ratioChart.update(); }
-        }
-        function saveSelection(){ const labels=_ratioChart.data.datasets.map(d=>d.label); localStorage.setItem(STORAGE.selected, JSON.stringify(labels)); }
-        function restoreSelection(){
-            const raw=localStorage.getItem(STORAGE.selected); if(!raw) return;
-            const want=new Set(JSON.parse(raw));
-            document.querySelectorAll('#ratioTable tbody tr').forEach(row=>{
-                const label=getLabel(row); if(want.has(label)) addDataset(label, getValues(row));
-            });
-        }
-
-        document.querySelectorAll('#ratioTable tbody tr').forEach((row)=>{
-            row.addEventListener('click',()=>{
-                const label=getLabel(row);
-                const exists=_ratioChart.data.datasets.some(d=>d.label===label);
-                if(exists){ removeDataset(label); toast(`${label} 제거`); }
-                else{
-                    if(_ratioChart.data.datasets.length>=5){ toast('최대 5개 표시'); return; }
-                    addDataset(label, getValues(row)); toast(`${label} 추가`);
-                }
-                saveSelection();
-            });
-        });
-
-        const yearSel=document.getElementById('yearRange');
-        if(yearSel){
-            const saved=localStorage.getItem(STORAGE.yearRange); if(saved){ yearSel.value=saved; }
-            function applyRange(){
-                const keep=parseInt(yearSel.value,10);
-                _ratioChart.data.labels = YEARS.slice(-keep);
-                _ratioChart.data.datasets.forEach(ds=>{ ds.data = ds.data.slice(-keep); });
-                _ratioChart.update();
-                localStorage.setItem(STORAGE.yearRange, yearSel.value);
-            }
-            yearSel.addEventListener('change', applyRange);
-            applyRange();
-        }
-
-        document.getElementById('btnExportCsv')?.addEventListener('click',function(){
-            const table=document.getElementById('ratioTable'); let csv='';
-            for(const row of table.rows){
-                const cells=[...row.cells].map(td=>{
-                    const t = td.innerText.replace(/\n/g,' ').trim().replace(/"/g,'""');
-                    return `"${t}"`;
-                });
-                csv += cells.join(',') + '\n';
-            }
-            const blob=new Blob(["\uFEFF"+csv],{type:'text/csv;charset=utf-8;'});
-            const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='ratio_table.csv'; a.click(); URL.revokeObjectURL(url);
-        });
-
-        document.getElementById('btnExportPng')?.addEventListener('click',function(){
-            const url=_ratioChart.toBase64Image('image/png',1);
-            const a=document.createElement('a'); a.href=url; a.download='ratio_chart.png'; a.click();
-        });
-
-        document.getElementById('btnResetZoom')?.addEventListener('click',function(){ if(_ratioChart.resetZoom){ _ratioChart.resetZoom(); } });
-
-        restoreSelection();
-    })();
-
-    /* ===== Radar Chart for factor ===== */
-    (function(){
-        const canvas = document.getElementById('factorChart'); if (!canvas) return;
-        const ctx = canvas.getContext('2d'); if (!ctx) return;
-
-        new Chart(ctx,{
-            type:'radar',
-            data:{
-                labels:['변동성','밸류','사이즈','모멘텀','베타','전망치'],
-                datasets:[{
-                    label:'팩터 점수',
-                    data:FACTOR,
-                    backgroundColor:'rgba(54,162,235,0.2)',
-                    borderColor:'rgba(54,162,235,1)',
-                    pointBackgroundColor:'rgba(54,162,235,1)',
-                    pointRadius:3,
-                    fill:true,
-                    tension:0.25
-                }]
-            },
-            options:{
-                responsive:true,
-                maintainAspectRatio:false,
-                plugins:{ legend:{display:false} },
-                scales:{
-                    r:{ beginAtZero:true, min:0, max:100, ticks:{stepSize:20}, angleLines:{color:'#eee'}, grid:{color:'#ddd'} }
-                }
-            }
-        });
-    })();
-
     /* ===== Support Charts (Sales Mix / Profit Rate / Growth) ===== */
+    // 매출액 구성
     (function(){
         const nf = new Intl.NumberFormat('ko-KR');
         const years=['2022','2023','2024']; //To-Do
+        const UNIT = 1000000; // 1백만 단위
+
+        const INCOMES = /*[[${incomePrices}]]*/ [];
+        console.log("INCOMES", INCOMES);  // 배열이면 OK
 
         function toPctStacks(stacks){
             const totals = years.map((_,i)=> stacks.reduce((s,st)=>s+(st.data[i]||0),0));
@@ -568,12 +447,12 @@
 
         const mixDataAbs={
             labels: years,
-            stacks: [
-                {label:'이자비용', data:[200,260,320]},
-                {label:'대손충당금', data:[300,420,520]},
-                {label:'이자외비용', data:[180,210,250]},
-                {label:'세전당기손익', data:[280,460,620]},
-                {label:'이자수익+이자외수익', data:[700,980,1200]}
+            stacks: [      // 데이터 임시적용, 항목정해야하고 금액크기 변환필요
+                { label: '이자비용', data: INCOMES.map(i => i.totalAssets) },
+                { label: '대손충당금', data: INCOMES.map(i => i.depositTotal) },
+                { label: '이자외비용', data: INCOMES.map(i => i.interestIncome) }
+//                {label:'세전당기손익', data:[280,460,620]},
+//                {label:'이자수익+이자외수익', data:[700,980,1200]}
             ],
             line:{label:'순이자마진', data:[2.3,2.1,2.4]}
         };
@@ -624,13 +503,17 @@
         document.getElementById('mixAbsBtn')?.addEventListener('click',()=>switchMix('abs'));
         document.getElementById('mixPctBtn')?.addEventListener('click',()=>switchMix('pct'));
 
+        // 두번째 차트
+        const PROFITS = /*[[${profitMargins}]]*/ [];
+        console.log("PROFITS", PROFITS);  // 배열이면 OK
+
         const prCtx=document.getElementById('profitRateChart')?.getContext('2d'); if(!prCtx) return;
         new Chart(prCtx,{
             type:'bar',
             data:{ labels:years, datasets:[
-                    { type:'bar', label:'이자수익+이자외수익', data:[1200,1500,1700], order:2 },
-                    { type:'line', label:'세전손익률', data:[21.8,18.9,20.5], yAxisID:'y2', order:1, tension:.3, pointRadius:2 },
-                    { type:'line', label:'순이익률', data:[17.2,15.1,16.4], yAxisID:'y2', order:1, tension:.3, pointRadius:2 }
+                    { type:'bar', label:'이자수익+이자외수익', data: PROFITS.map(i => i.totalAssets), order:2 },
+                    { type:'line', label:'세전손익률', data: PROFITS.map(i => i.depositTotal), yAxisID:'y2', order:1, tension:.3, pointRadius:2 },
+                    { type:'line', label:'순이익률', data: PROFITS.map(i => i.interestIncome), yAxisID:'y2', order:1, tension:.3, pointRadius:2 }
                 ]},
             options:{
                 responsive:true, maintainAspectRatio:false,
@@ -641,15 +524,18 @@
                 plugins:{ legend:{position:'bottom'} }
             }
         });
+        // 세번째 차트
+        const PROGROWTH = /*[[${profitGrowths}]]*/ [];
+        console.log("PROGROWTH", PROGROWTH);  // 배열이면 OK
 
         const grCtx=document.getElementById('growthChart')?.getContext('2d'); if(!grCtx) return;
         new Chart(grCtx,{
             type:'line',
             data:{ labels:years, datasets:[
-                    { label:'순이자수익성장률', data:[50,20,24], tension:.3, pointRadius:2 },
-                    { label:'대손충당금 차감 후 순이자수익', data:[40,18,22], tension:.3, pointRadius:2 },
-                    { label:'세전당기손익성장률', data:[35,14,26], tension:.3, pointRadius:2 },
-                    { label:'순이익성장률', data:[32,15,23], tension:.3, pointRadius:2 }
+                    { label:'순이자수익성장률', data:PROGROWTH.map(i => i.totalAssets), tension:.3, pointRadius:2 },
+                    { label:'대손충당금 차감 후 순이자수익', data:PROGROWTH.map(i => i.totalAssets), tension:.3, pointRadius:2 },
+                    { label:'세전당기손익성장률', data:PROGROWTH.map(i => i.depositTotal), tension:.3, pointRadius:2 },
+                    { label:'순이익성장률', data:PROGROWTH.map(i => i.interestIncome), tension:.3, pointRadius:2 }
                 ]},
             options:{
                 responsive:true, maintainAspectRatio:false,
@@ -659,362 +545,12 @@
         });
     })();
 
-    /* ===== Profit/Risk Tab ===== */
-    (function(){
-        // 서버 데이터 (Thymeleaf 바인딩; 폴백)
-        const RETURNS = /*[[${monthlyReturns}]]*/ [-1.2, 0.8, 1.1, -0.6, 2.2, 0.3, -1.4, 1.9, 0.5, -0.9, 1.3, 0.7,
-            0.6, -0.4, 1.0, 0.2, -0.7, 1.5, -0.3, 0.9, 0.4, -1.1, 1.2, 0.1];
-        const PNL_AMOUNT = /*[[${pnlAmount}]]*/ [50, 65, 80, 75, 100, 103, 88, 110, 116, 108, 123, 128,
-            131, 129, 140, 145, 138, 158, 153, 166, 170, 160, 178, 180];
-        const DECOMP = /*[[${pnlDecomposition}]]*/ {
-            labels: ['2022','2023','2024'],
-            stacks: [
-                {label:'이자수익', data:[520, 640, 780]},
-                {label:'이자비용', data:[-200, -260, -320]},
-                {label:'이자외수익', data:[180, 210, 250]},
-                {label:'이자외비용', data:[-120, -140, -160]},
-                {label:'대손충당금', data:[-140, -220, -260]}
-            ],
-            net: {label:'세전당기손익', data:[240, 230, 290]}
-        };
 
-        const nf = new Intl.NumberFormat('ko-KR');
-
-        function stdev(arr){
-            if(!arr.length) return 0;
-            const m = arr.reduce((a,b)=>a+b,0)/arr.length;
-            const v = arr.reduce((s,x)=> s + Math.pow(x-m,2), 0) / (arr.length-1 || 1);
-            return Math.sqrt(v);
-        }
-        function annualizeVol(monthlyStd){ return monthlyStd * Math.sqrt(12); }
-        function maxDrawdown(series){ // series: 누적지표(정규화) 시퀀스
-            let peak = -Infinity, mdd = 0;
-            for(const x of series){ peak = Math.max(peak, x); mdd = Math.min(mdd, (x - peak) / peak); }
-            return mdd; // 음수
-        }
-        function toPctStacks(stacks){
-            const n = Math.max(...stacks.map(s=> s.data.length));
-            const totals = Array.from({length:n}, (_,i)=> stacks.reduce((s,st)=> s + (st.data[i]||0),0));
-            return stacks.map(st=> ({ label: st.label, data: st.data.map((v,i)=> totals[i] ? +(v/totals[i]*100).toFixed(2) : 0) }));
-        }
-
-        let pnlCurveChart=null, pnlDecompChart=null;
-        let pnlMode='cum';
-        let pnlRange='12';
-        let decompMode='abs';
-
-        const $profitTabBtn = document.querySelector('[data-bs-target="#profit"]');
-
-        function buildOrUpdateAll(){
-            const lastN = pnlRange==='all' ? RETURNS.length : Math.min(+pnlRange, RETURNS.length);
-            const ret = RETURNS.slice(-lastN);
-            const pnlAmt = PNL_AMOUNT.slice(-lastN);
-
-            // 기간/누적 금액
-            const labels = Array.from({length:lastN}, (_,i)=> `M${RETURNS.length-lastN+i+1}`);
-            const base = (pnlMode==='cum')
-                ? pnlAmt
-                : pnlAmt.map((v,i,arr)=> i===0 ? 0 : v - arr[i-1]);
-
-            // 드로우다운 (누적기준 정규화 + 0 가드)
-            const base0 = Math.max(1e-9, Math.abs(pnlAmt[0] ?? 0)); // 0 가드
-            const cumForDD = pnlAmt.map(v => v / base0);
-            const mdd = maxDrawdown(cumForDD);
-            const drawdownPct = cumForDD.map((v,i)=>{
-                const peak = Math.max(...cumForDD.slice(0,i+1));
-                return (v-peak)/peak * 100;
-            }).slice(-lastN);
-
-            const pnlCtx = document.getElementById('pnlCurveChart')?.getContext('2d');
-            if(!pnlCtx) return;
-            if(!pnlCurveChart){
-                pnlCurveChart = new Chart(pnlCtx,{
-                    type:'line',
-                    data:{ labels, datasets:[
-                            { type:'line', label: (pnlMode==='cum'?'누적 손익(만원)':'기간 손익(만원)'),
-                                data: base, yAxisID:'y', tension:.25, pointRadius:0, borderWidth:1.5, fill:false },
-                            { type:'line', label:'드로우다운(%)',
-                                data: drawdownPct, yAxisID:'y2', tension:.25, pointRadius:0, borderWidth:1, borderDash:[4,4] }
-                        ]},
-                    options:{
-                        responsive:true, maintainAspectRatio:false,
-                        interaction:{intersect:false, mode:'index'},
-                        plugins:{ legend:{position:'bottom'},
-                            zoom:{ pan:{enabled:true,mode:'x'}, zoom:{ wheel:{enabled:true}, pinch:{enabled:true}, mode:'x'} } },
-                        scales:{
-                            y:{ position:'left', beginAtZero:false, ticks:{ callback:v=> '₩'+nf.format(v*10000) } },
-                            y2:{ position:'right', beginAtZero:true, grid:{drawOnChartArea:false}, ticks:{ callback:v=> v+'%' } }
-                        }
-                    }
-                });
-            }else{
-                pnlCurveChart.data.labels = labels;
-                pnlCurveChart.data.datasets[0].label = (pnlMode==='cum'?'누적 손익(만원)':'기간 손익(만원)');
-                pnlCurveChart.data.datasets[0].data = base;
-                pnlCurveChart.data.datasets[1].data = drawdownPct;
-                pnlCurveChart.update();
-            }
-
-            // 손익 분해
-            const useStacks = (decompMode==='pct') ? toPctStacks(DECOMP.stacks) : DECOMP.stacks;
-            const yTick = (decompMode==='pct') ? (v=> v+'%') : (v=> '₩'+nf.format(v*10000));
-            const decompCtx=document.getElementById('pnlDecompChart')?.getContext('2d');
-            if(decompCtx){
-                if(!pnlDecompChart){
-                    pnlDecompChart = new Chart(decompCtx,{
-                        type:'bar',
-                        data:{ labels: DECOMP.labels,
-                            datasets:[
-                                ...useStacks.map(s=> ({type:'bar', label:s.label, data:s.data, stack:'stack', order:2})),
-                                { type:'line', label:DECOMP.net.label, data:DECOMP.net.data, yAxisID:'y2', order:1, pointRadius:2, tension:.25 }
-                            ]},
-                        options:{
-                            responsive:true, maintainAspectRatio:false,
-                            scales:{
-                                x:{ stacked:true },
-                                y:{ stacked:true, beginAtZero:false, ticks:{ callback:yTick } },
-                                y2:{ position:'right', grid:{drawOnChartArea:false}, ticks:{ callback:v=> '₩'+nf.format(v*10000) } }
-                            },
-                            plugins:{ legend:{position:'bottom'} }
-                        }
-                    });
-                }else{
-                    for(let i=0;i<useStacks.length;i++){
-                        pnlDecompChart.data.datasets[i].data = useStacks[i].data;
-                        pnlDecompChart.data.datasets[i].type='bar';
-                        pnlDecompChart.data.datasets[i].yAxisID='y';
-                        pnlDecompChart.data.datasets[i].stack='stack';
-                    }
-                    pnlDecompChart.options.scales.y.ticks.callback = yTick;
-                    pnlDecompChart.update();
-                }
-            }
-
-            // ===== KPI 산출 =====
-            const meanMonthly = ret.reduce((a,b)=>a+b,0) / (ret.length || 1); // %
-            const mStd = stdev(ret);                  // 월간 표준편차 (%)
-            const annRetPct = ((1 + meanMonthly/100) ** 12 - 1) * 100; // %
-            const annVolPct = annualizeVol(mStd);    // % (단위 통일)
-            const sharpe = annVolPct ? (annRetPct / annVolPct) : 0; // Rf=0 가정
-            const winratePct = (ret.filter(x=>x>0).length / (ret.length||1) * 100);
-
-            const var95 = (mStd*1.65);               // 월간 VaR(%) 근사
-            const mddPct = Math.abs(mdd*100);
-
-            const $ = (id)=>document.getElementById(id);
-            $('kpiSharpe').textContent  = sharpe.toFixed(2);
-            $('kpiWinrate').textContent = winratePct.toFixed(1)+'%';
-            $('kpiVol').textContent     = annVolPct.toFixed(2)+'%';
-            $('kpiBeta').textContent    = (/*[[${beta}]]*/ 1.00).toFixed(2);
-            $('kpiVaR').textContent     = var95.toFixed(2)+'%';
-            $('kpiMdd').textContent     = mddPct.toFixed(2)+'%';
-        }
-
-        // 이벤트 바인딩
-        document.getElementById('pnlRange')?.addEventListener('change', (e)=>{ pnlRange=e.target.value; buildOrUpdateAll(); });
-        document.getElementById('pnlModeCum')?.addEventListener('click', ()=>{
-            pnlMode='cum';
-            document.getElementById('pnlModeCum').classList.add('active');
-            document.getElementById('pnlModePer').classList.remove('active');
-            buildOrUpdateAll();
-        });
-        document.getElementById('pnlModePer')?.addEventListener('click', ()=>{
-            pnlMode='per';
-            document.getElementById('pnlModePer').classList.add('active');
-            document.getElementById('pnlModeCum').classList.remove('active');
-            buildOrUpdateAll();
-        });
-        document.getElementById('decompAbs')?.addEventListener('click', ()=>{
-            decompMode='abs';
-            document.getElementById('decompAbs').classList.add('active');
-            document.getElementById('decompPct').classList.remove('active');
-            buildOrUpdateAll();
-        });
-        document.getElementById('decompPct')?.addEventListener('click', ()=>{
-            decompMode='pct';
-            document.getElementById('decompPct').classList.add('active');
-            document.getElementById('decompAbs').classList.remove('active');
-            buildOrUpdateAll();
-        });
-
-        document.getElementById('pnlExportPng')?.addEventListener('click', ()=>{
-            if(!pnlCurveChart) return;
-            const url = pnlCurveChart.toBase64Image('image/png',1);
-            const a=document.createElement('a'); a.href=url; a.download='pnl_curve.png'; a.click();
-        });
-        document.getElementById('pnlResetZoom')?.addEventListener('click', ()=>{ pnlCurveChart?.resetZoom?.(); });
-
-        // 탭 표시 시 초기화/리사이즈
-        let initialized=false;
-        $profitTabBtn?.addEventListener('shown.bs.tab', ()=>{
-            if(!initialized){ initialized=true; buildOrUpdateAll(); }
-            else{
-                pnlCurveChart?.resize?.();
-                pnlDecompChart?.resize?.();
-            }
-        });
-    })();
-
-    /* ===== Strategy buttons & GenAI output (single source of truth) ===== */
-    (function(){
-        const $prompt    = document.getElementById('stratPrompt');
-        const $pnlRange  = document.getElementById('pnlRange');
-        const $modePer   = document.getElementById('pnlModePer');
-        const $output    = document.getElementById('genaiOutput');
-
-        // ▼ 신규: 옵션 엘리먼트
-        const $kinds     = document.getElementById('stratKinds');
-        const $risk      = document.getElementById('stratRisk');
-        const $optLev    = document.getElementById('optLeverage');
-        const $optHedge  = document.getElementById('optHedge');
-
-        function setOutputText(text){ if($output) $output.textContent = text; }
-        function appendOutputText(text){ if($output) $output.textContent += text; }
-
-        // ▼ 전략 프리셋마다 권장 제약/설명을 매핑 (백엔드가 활용해도 됨)
-        const STRATEGY_TEMPLATES = {
-            barbell: {
-                label: '바벨',
-                note: '초저위험/초고위험을 양 끝단으로 배치, 중간 위험 제거. 현금/단기채 + 고변동 섹터/팩터.',
-                constraints: { midRiskAssets: 'minimize', tailRiskBudget: 'allow' }
-            },
-            balanced: {
-                label: '균형형',
-                note: '주식/채권/대체 간 균형, 자산군 상관관계 고려한 리밸런스.',
-                constraints: { targetVol: '8~12%', rebalance: 'quarterly' }
-            },
-            aggressive: {
-                label: '공격적',
-                note: '고베타/모멘텀/성장 비중 확대, 변동성/낙폭 허용.',
-                constraints: { maxDrawdownTarget: '20~35%', betaBias: '>1.1' }
-            },
-            defensive: {
-                label: '방어적',
-                note: '저변동/가치/퀄리티 중심, 낙폭 축소 우선.',
-                constraints: { maxDrawdownTarget: '<=15%', betaBias: '<0.9' }
-            },
-            value:     { label:'가치',     note:'저평가·현금흐름·배당 지표 우선.', constraints:{ factorTilt:'Value' } },
-            growth:    { label:'성장',     note:'매출/이익 성장률·가이던스 상향 우선.', constraints:{ factorTilt:'Growth' } },
-            dividend:  { label:'배당',     note:'배당수익률·증가·지속가능성.', constraints:{ payoutPolicy:'stable' } },
-            momentum:  { label:'모멘텀',   note:'가격/실적 모멘텀 동행.', constraints:{ lookback:'6~12M' } },
-            quality:   { label:'퀄리티',   note:'수익성·안정성·재무건전성.', constraints:{ filter:'ROE/ROA/부채비율' } },
-            riskParity:{ label:'리스크 패리티', note:'기여 변동성 균등화.', constraints:{ riskContribution:'equal' } },
-            dualMomentum:{ label:'듀얼 모멘텀', note:'절대+상대 모멘텀 결합.', constraints:{ cashOnWeakness:true } },
-            hedged:    { label:'헤지',     note:'선물/옵션/인버스 등 하방 방어.', constraints:{ hedgeRatio:'0~50%' } }
-        };
-
-        function getSelectedKinds(){
-            if(!$kinds) return [];
-            return Array.from($kinds.selectedOptions).map(o=>o.value);
-        }
-
-        // ▼ 리스크 성향별 가이드(백엔드 힌트)
-        const RISK_PROFILE_HINT = {
-            conservative: { targetVol:'5~8%',  maxDrawdown:'<=12%', turnover:'low' },
-            moderate:     { targetVol:'8~12%', maxDrawdown:'<=20%', turnover:'mid' },
-            aggressive:   { targetVol:'12~18%',maxDrawdown:'<=35%', turnover:'mid~high' }
-        };
-
-        // ▼ 사람이 읽기 좋은 “요약 프롬프트” 생성 (선택한 옵션을 자연어로 합성)
-        function buildNaturalPrompt({prompt, kinds, risk, leverage, hedge, horizon, mode}){
-            const kLabels = kinds.map(k=> STRATEGY_TEMPLATES[k]?.label || k).join(', ');
-            const riskKo  = {conservative:'보수적', moderate:'중립', aggressive:'공격적'}[risk] || risk;
-
-            const hints = RISK_PROFILE_HINT[risk] || {};
-            const flags = [
-                leverage ? '레버리지 허용' : '레버리지 미사용',
-                hedge ? '헤지 사용' : '헤지 미사용',
-                (mode==='per' ? '기간손익 기준' : '누적손익 기준')
-            ].join(', ');
-
-            const kindNotes = kinds
-                .map(k=> STRATEGY_TEMPLATES[k]?.note)
-                .filter(Boolean)
-                .map(n=> `- ${n}`)
-                .join('\n');
-
-            return [
-                `요청 전략: ${kLabels || '일반'} (${riskKo})`,
-                `분석 구간: 최근 ${horizon==='all'?'전체':horizon+'개월'} / 표시단위: ${mode==='per'?'기간':'누적'}`,
-                `옵션: ${flags}`,
-                `리스크 가이드: 목표 변동성 ${hints.targetVol || '-'}, MDD ${hints.maxDrawdown || '-'}, 회전율 ${hints.turnover || '-'}`,
-                kindNotes && `전략 노트:\n${kindNotes}`,
-                prompt && `사용자 프롬프트: ${prompt}`
-            ].filter(Boolean).join('\n');
-        }
-
-        // ▼ 백엔드로 넘길 payload
-        function payload(){
-            const kinds = getSelectedKinds();
-            return {
-                prompt: ($prompt?.value || '').trim(),
-                horizon: $pnlRange?.value || '12',
-                mode: ($modePer?.classList.contains('active') ? 'per' : 'cum'),
-                strategy: {
-                    kinds,                           // 예: ['barbell','aggressive']
-                    risk: $risk?.value || 'moderate',
-                    leverageAllowed: !!$optLev?.checked,
-                    hedgeAllowed: !!$optHedge?.checked
-                },
-                // 힌트(선택): 서버가 프롬프트 엔지니어링에 쓰기 좋게 제공
-                hints: {
-                    riskProfile: RISK_PROFILE_HINT[$risk?.value || 'moderate'] || {},
-                    templates: kinds.map(k=> STRATEGY_TEMPLATES[k] || {label:k})
-                },
-                // 사람이 보기에 좋은 합성 프롬프트 (서버가 바로 써도 OK)
-                naturalPrompt: buildNaturalPrompt({
-                    prompt: ($prompt?.value || '').trim(),
-                    kinds,
-                    risk: $risk?.value || 'moderate',
-                    leverage: !!$optLev?.checked,
-                    hedge: !!$optHedge?.checked,
-                    horizon: $pnlRange?.value || '12',
-                    mode: ($modePer?.classList.contains('active') ? 'per' : 'cum')
-                })
-            };
-        }
-
-        function fire(type){
-            const detail = payload();
-            document.dispatchEvent(new CustomEvent(type, { detail }));
-
-            const title = (type==='strategy:generate' ? '전략 생성'
-                : type==='strategy:riskAudit' ? '리스크 점검'
-                    : '리밸런싱 제안');
-
-            setOutputText(
-                `[${title}] 요청을 전송했습니다.${detail.naturalPrompt}(백엔드 연동 시 이 영역에 생성 결과가 렌더링됩니다.)`);
-        }
-
-        document.getElementById('btnGenStrategy')?.addEventListener('click', ()=> fire('strategy:generate'));
-        document.getElementById('btnRiskAudit')?.addEventListener('click', ()=> fire('strategy:riskAudit'));
-        document.getElementById('btnRebalance')?.addEventListener('click', ()=> fire('strategy:rebalance'));
-
-        document.getElementById('btnExportProfitPng')?.addEventListener('click', ()=>{
-            document.getElementById('pnlExportPng')?.click();
-        });
-        document.getElementById('btnResetProfitZoom')?.addEventListener('click', ()=>{
-            document.getElementById('pnlResetZoom')?.click();
-        });
-
-        // 결과 패널 도구
-        document.getElementById('btnCopyGenai')?.addEventListener('click', async ()=>{
-            try{
-                await navigator.clipboard.writeText($output?.innerText || $output?.textContent || '');
-                appendOutputText('\n\n(복사 완료)');
-            }catch(e){
-                appendOutputText('\n\n(복사 실패: 브라우저 권한을 확인하세요)');
-            }
-        });
-        document.getElementById('btnClearGenai')?.addEventListener('click', ()=>{
-            setOutputText('결과가 여기에 표시됩니다.');
-        });
-    })();
 
     // ===== Backend wiring placeholders =====
     document.addEventListener('strategy:generate', (e)=>{
         // e.detail 구조 확인
-        console.log('strategy:generate payload', e.detail);
+//        console.log('strategy:generate payload', e.detail);
 
         // 예시: 서버 호출
         // fetch('/api/strategy/generate', {
@@ -1027,11 +563,11 @@
     });
 
     document.addEventListener('strategy:riskAudit', (e)=>{
-        console.log('strategy:riskAudit payload', e.detail);
+//        console.log('strategy:riskAudit payload', e.detail);
         // TODO
     });
     document.addEventListener('strategy:rebalance', (e)=>{
-        console.log('strategy:rebalance payload', e.detail);
+//        console.log('strategy:rebalance payload', e.detail);
         // TODO
     });
 </script>

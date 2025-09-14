@@ -1,23 +1,128 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Chat with OpenAI (Streaming)</title>
+    <style>
+        body{font-family:system-ui,apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;margin:24px}
+        .wrap{max-width:720px;margin:0 auto}
+        textarea{width:100%;min-height:100px;padding:12px;font-size:16px}
+        button{padding:10px 16px;font-size:15px;border-radius:10px;border:1px solid #ddd;background:#fff;cursor:pointer}
+        pre{white-space:pre-wrap;word-break:break-word;background:#fafafa;border:1px solid #eee;border-radius:12px;padding:12px;min-height:120px}
+        .row{display:flex;gap:8px;align-items:center;margin:10px 0}
+    </style>
 </head>
 <body>
+<div class="wrap">
+    <h1>ChatGPT (Responses API · Streaming)</h1>
+    <textarea id="input" placeholder="메시지를 입력하고 '보내기'를 눌러보세요."></textarea>
+    <div class="row">
+        <button id="send">보내기</button>
+        <span id="status"></span>
+    </div>
+    <h3>응답</h3>
+    <pre id="out"></pre>
+</div>
 
-    <!-- 개별로 -->
-    <h1 th:text="${eno}">사번</h1>
-    <h1 th:text="${empnm}">이름</h1>
-    <h1 th:text="${brc}">사무소코드</h1>
-    <h1 th:text="${brnm}">사무소명</h1>
+<script>
+    const $ = (sel) => document.querySelector(sel);
+    const out = $("#out");
+    const statusEl = $("#status");
 
-    <!-- 통채로 -->
-    <h1 th:text="${sample.eno}">사번</h1>
-    <h1 th:text="${sample.empnm}">이름</h1>
-    <h1 th:text="${sample.brc}">사무소코드</h1>
-    <h1 th:text="${sample.brnm}">사무소명</h1>
+    function append(text) {
+        out.textContent += text;
+    }
+    function reset() {
+        out.textContent = "";
+    }
 
-    <img height="110" width="100" th:src="@{/img/nh_symbol.gif}" src="/img/nh_symbol.gif" alt="NH 로고" loading="lazy">
+    // OpenAI Responses API의 SSE 이벤트를 파싱
+    // 각 라인은 'data: {...}\n\n' 형태로 도착
+    function parseSSE(chunkText, onEvent) {
+        const events = chunkText.split(/\n\n/);
+        for (const evt of events) {
+            if (!evt.trim()) continue;
+            const m = evt.match(/^data:\s*(.*)$/s);
+            if (!m) continue;
+            const json = m[1].trim();
+            if (json === "[DONE]") {
+                onEvent({ type: "done" });
+                continue;
+            }
+            try {
+                const obj = JSON.parse(json);
+                onEvent(obj);
+            } catch { /* ignore malformed lines */ }
+        }
+    }
+
+    async function sendMessage() {
+        const prompt = $("#input").value.trim();
+        if (!prompt) return;
+
+        reset();
+        statusEl.textContent = "생성 중…";
+
+        const resp = await fetch("http://localhost:3000/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt }),
+        });
+
+        if (!resp.ok || !resp.body) {
+            statusEl.textContent = "요청 실패";
+            append(`\n[Error] HTTP ${resp.status}`);
+            return;
+        }
+
+        const reader = resp.body.getReader();
+        const decoder = new TextDecoder();
+
+        // chunk 단위로 SSE 프레임 파싱
+        let buffer = "";
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            // SSE 프레임 경계(`\n\n`) 기준으로 파싱 시도
+            const frames = buffer.split(/\n\n(?=data:)/);
+            buffer = frames.pop() ?? ""; // 마지막 덩어리는 다음 루프에서 이어붙임
+
+            for (const frame of frames) {
+                parseSSE(frame + "\n\n", (event) => {
+                    // Responses API 스트리밍 이벤트 타입 처리
+                    // 주로 `response.output_text.delta` 에 토큰 단위 텍스트가 들어옴
+                    if (event.type === "response.output_text.delta" && event.delta) {
+                        append(event.delta);
+                    } else if (event.type === "error") {
+                        append(`\n[Error] ${event.message || "unknown error"}`);
+                    } else if (event.type === "done" || event.type === "response.completed") {
+                        // 완료 신호
+                    }
+                });
+            }
+        }
+
+        // 남은 버퍼 플러시
+        if (buffer) {
+            parseSSE(buffer, (event) => {
+                if (event.type === "response.output_text.delta" && event.delta) {
+                    append(event.delta);
+                }
+            });
+        }
+
+        statusEl.textContent = "완료";
+    }
+
+    $("#send").addEventListener("click", sendMessage);
+    $("#input").addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+            sendMessage();
+        }
+    });
+</script>
 </body>
 </html>
