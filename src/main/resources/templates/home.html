@@ -486,10 +486,32 @@
                                 <div class="mt-3">
                                     <h2 class="h6 fw-bold mb-1">소개</h2>
                                     <hr class="mt-0 mb-2">
-                                    <p class="mb-0" style="font-size:0.9rem"
-                                       th:text="${brcInfos[0]?.description} ?: '여기에 회사 소개 글을 입력하세요.'">
-                                    </p>
 
+                                    <!-- 소개 요약 정보 -->
+                                    <dl class="row g-2 small mb-2">
+                                        <dt class="col-4 col-sm-3 text-muted">조합장</dt>
+                                        <dd class="col-8 col-sm-9"
+                                            th:text="${brcInfos[0]?.ceoNm} ?: '—'">—</dd>
+
+                                        <dt class="col-4 col-sm-3 text-muted">설립일</dt>
+                                        <dd class="col-8 col-sm-9"
+                                            th:text="${brcInfos[0] != null and !#strings.isEmpty(brcInfos[0].foundationDt) ? brcInfos[0].foundationDt : '—'}">—</dd>
+
+                                        <dt class="col-4 col-sm-3 text-muted">직원수</dt>
+                                        <dd class="col-8 col-sm-9"
+                                            th:text="${brcInfos[0]?.employees != null ? #numbers.formatInteger(brcInfos[0].employees,0) + '명' : '—'}">—</dd>
+
+                                        <dt class="col-4 col-sm-3 text-muted">주소</dt>
+                                        <dd class="col-8 col-sm-9"
+                                            th:text="${brcInfos[0]?.address} ?: '—'">—</dd>
+                                    </dl>
+
+                                    <!-- 소개글 위 구분선 -->
+                                    <hr class="my-2">
+
+                                    <!-- 소개 본문 -->
+                                    <p class="mb-0" style="font-size:0.9rem"
+                                       th:text="${brcInfos[0]?.description} ?: '여기에 회사 소개 글을 입력하세요.'"></p>
                                 </div>
                             </section>
 

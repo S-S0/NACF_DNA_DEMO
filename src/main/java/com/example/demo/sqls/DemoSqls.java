@@ -56,7 +56,7 @@ public class DemoSqls {
 
     // 사무소 설명
     public static final String DESC_BY_BRC =
-            "SELECT brnm, ceo_nm, description \n" +
-                    " FROM brc_info\n" +
-                    " WHERE BRC = :brc";
+            "SELECT brc, brnm, ceo_nm, foundation_dt, employees, address, description " +
+                    "FROM brc_info " +
+                    "WHERE BRC = :brc";
 }
