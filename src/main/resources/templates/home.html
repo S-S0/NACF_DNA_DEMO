@@ -1729,11 +1729,14 @@
             c.update();
         });
     })();
+
+
+
     /* ===== Profit/Risk Tab ===== */
     (function () {
-        const RETURNS = /*[[${monthlyReturns}]]*/ null || [];
-        const PNL_AMOUNT = /*[[${pnlAmount}]]*/ null || [];
-        const DECOMP = /*[[${pnlDecomposition}]]*/ null || {labels: [], stacks: [], net: {label: '세전당기손익', data: []}};
+        const RETURNS = /*[[${monthlyReturns}]]*/ null || []; //현진선배님TODO
+        const PNL_AMOUNT = /*[[${pnlAmount}]]*/ null || []; //현진선배님TODO
+        const DECOMP = /*[[${pnlDecomposition}]]*/ null || {labels: [], stacks: [], net: {label: '세전당기손익', data: []}}; //현진선배님TODO
 
         const nf = new Intl.NumberFormat('ko-KR');
 
