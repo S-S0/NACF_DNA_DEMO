@@ -16,9 +16,14 @@
 
     <style>
         :root{ --card-radius:8px; --shadow-sm:0 2px 4px rgba(0,0,0,.05); }
+        html, body {
+            height: 100dvh;
+            overflow: hidden;         /* ← window 스크롤 막기 */
+        }
+
         body{display:flex;flex-direction:column;min-height:100vh;margin:0;overflow-x:hidden}
         header{background:#f8f9fa;padding:1rem;min-height:80px}
-        main{flex:1;display:flex;justify-content:center;align-items:stretch}
+        main{flex:1 1 auto; min-height: 0; overflow: hidden; display:flex;justify-content:center;align-items:stretch}
         footer{background:#f8f9fa;padding:1rem;min-height:60px;text-align:center;font-size:.875rem;color:#6c757d}
         .logo-square{width:60px;height:60px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
         .logo-square img{width:100%;height:100%;object-fit:contain}
@@ -26,7 +31,18 @@
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
         input[type=number]{-moz-appearance:textfield}
-        .content-container{width:100%;min-height:500px;max-height:calc(100vh - 190px);overflow:auto;border:1px solid #dee2e6;border-radius:var(--card-radius);padding:1rem;display:flex;flex-direction:column;background:#fff;box-shadow:var(--shadow-sm)}
+        .content-container{width:100%;
+            min-height:0;
+            max-height:none;
+            overflow:auto;
+            border:1px solid #dee2e6;
+            border-radius:var(--card-radius);
+            padding:1rem;
+            display:flex;
+            flex-direction:column;
+            background:#fff;
+            box-shadow:var(--shadow-sm)
+        }
         .corp-name{font-size:1.25rem;font-weight:700;margin-top:.5rem}
         .price-info{display:flex;align-items:center;gap:.5rem;margin-bottom:1rem}
         .price-big{font-size:1.5rem;font-weight:700}
@@ -85,6 +101,9 @@
         }
         @media (min-width: 992px){
             .strategy-row{ grid-template-columns: 1fr auto auto; } /* 데스크톱: [뱃지+드롭다운] [리스크] [실행버튼] */
+        }
+        @media (min-height: 900px) {
+            .content-container { min-height: 500px; }
         }
         .strategy-actions { flex-wrap: nowrap; }              /* 그룹 자체 줄바꿈 방지 */
         .strategy-actions .btn{
