@@ -34,6 +34,7 @@ public class DemoController {
             brc = "707015";
         } // 사무소코드가 없을 경우 기본 방어로직 - 안동농협?
 
+        // 첫번째 탭 모델 ------------------------------------------------------------------
         List<FactorScore> fs = demoService.factorByBrc(brc);
         model.addAttribute("factorScores", fs);
 
@@ -55,7 +56,7 @@ public class DemoController {
         List<BrcInfo> db = demoService. descByBRC(brc);
         model.addAttribute("brcInfos", db);
 
-
+        // 두번째 탭 모델 ------------------------------------------------------------------
         // 연도 목록
         List<String> years = Arrays.asList("2020","2021","2022","2023","2024");
 
@@ -69,6 +70,17 @@ public class DemoController {
         model.addAttribute("years", years);
         model.addAttribute("pageTitle", "재무 대시보드");
         model.addAttribute("corp", Map.of("name", brc + "농협")); // 사무소코드별 이름 정해야함
+
+        // 세번째 탭 모델 ------------------------------------------------------------------
+        /* !!핵심지표 5개 바인딩할때 사용하시면 됩니다.!!
+        model.addAttribute("valuation", Map.of(
+                "per",         perValue,         // Double
+                "pbr",         pbrValue,         // Double
+                "evToSales",   evSalesValue,     // Double
+                "evToEbitda",  evEbitdaValue,    // Double
+                "evToEbit",    evEbitValue       // Double
+        ));
+        */
 
         return "home";
     }
@@ -96,20 +108,5 @@ public class DemoController {
     }
 
     // ------------------------------------------------------------------
-    // 세번째페이지 테스트
-    @RequestMapping(method = RequestMethod.GET, path = "/pg_3")
-    public String pg_3(Model model) {
 
-        /* !!핵심지표 5개 바인딩할때 사용하시면 됩니다.!!
-        model.addAttribute("valuation", Map.of(
-                "per",         perValue,         // Double
-                "pbr",         pbrValue,         // Double
-                "evToSales",   evSalesValue,     // Double
-                "evToEbitda",  evEbitdaValue,    // Double
-                "evToEbit",    evEbitValue       // Double
-        ));
-        */
-
-        return "pg_3";
-    }
 }
