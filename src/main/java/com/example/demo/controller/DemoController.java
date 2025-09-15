@@ -93,20 +93,21 @@ public class DemoController {
     public String temp() {
         return "temp";
     }
+
     // ------------------------------------------------------------------
-    // 정상접속 테스트용
+    // AI테스트
     @RequestMapping(method = RequestMethod.GET, path = "/test")
     public String test(Model model) {
-        DemoSample sample = demoService.findByEno("19301062");
-
-        // 개별로 붙이는 방법
-        model.addAttribute("eno", sample.getEno());
-        model.addAttribute("empnm", sample.getEmpnm());
-        model.addAttribute("brc", sample.getBrc());
-        model.addAttribute("brnm", sample.getBrnm());
-
-        // DTO 통채로 붙이는 방법
-        model.addAttribute("sample", sample);
+//        DemoSample sample = demoService.findByEno("19301062");
+//
+//        // 개별로 붙이는 방법
+//        model.addAttribute("eno", sample.getEno());
+//        model.addAttribute("empnm", sample.getEmpnm());
+//        model.addAttribute("brc", sample.getBrc());
+//        model.addAttribute("brnm", sample.getBrnm());
+//
+//        // DTO 통채로 붙이는 방법
+//        model.addAttribute("sample", sample);
         return "test";
     }
 
