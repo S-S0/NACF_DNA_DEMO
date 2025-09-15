@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <title>ChatGPT(Responses API) 데모</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root {
+            --max-width: 980px;
+            --radius: 10px;
+            --shadow: 0 4px 14px rgba(0,0,0,.06);
+        }
+        * { box-sizing: border-box; }
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 0; padding: 24px; background: #f7f8fa; }
+        .wrap { max-width: var(--max-width); margin: 0 auto; }
+        h2 { margin: 0 0 8px; }
+        .hint { color:#667085; margin: 0 0 16px; }
+
+        .panel {
+            background: #fff;
+            border: 1px solid #e6e8eb;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+
+        .input-row { display: flex; gap: 8px; align-items: stretch; }
+        textarea {
+            flex: 1;
+            min-height: 110px;
+            max-height: 40vh;
+            resize: vertical;
+            padding: 12px;
+            border: 1px solid #d0d5dd;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color .15s ease;
+            background:#fff;
+        }
+        textarea:focus { border-color:#84adff; }
+
+        button {
+            padding: 10px 18px;
+            border: 1px solid #155eef;
+            background: #155eef;
+            color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            height: 44px;
+            align-self: flex-start;
+        }
+        button:disabled { opacity:.6; cursor:not-allowed; }
+
+        .log {
+            margin-top: 14px;
+            border: 1px solid #e6e8eb;
+            border-radius: var(--radius);
+            background: #fcfcfd;
+            padding: 12px;
+            /* 스크롤바: 대화 길어지면 세로 스크롤 생기도록 */
+            max-height: 65vh;
+            overflow-y: auto;
+        }
+
+        .msg { margin: 8px 0; white-space: pre-wrap; line-height: 1.5; }
+        .msg .bubble {
+            display: inline-block;
+            padding: 10px 12px;
+            border-radius: 12px;
+            max-width: 100%;
+            word-break: break-word;
+        }
+        .user .bubble { background:#e8f0ff; color:#0b67ff; }
+        .assistant .bubble { background:#eef7f1; color:#1a7f37; }
+        .sys { color:#8a8f98; font-size: 0.92rem; }
+
+        .toolbar {
+            display:flex; align-items:center; gap:10px; margin-top:8px; color:#6b7280; font-size: 0.9rem;
+        }
+        .toggle {
+            display:flex; align-items:center; gap:6px; user-select:none; cursor:pointer;
+        }
+        .toggle input { accent-color:#155eef; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h2>ChatGPT 연동 데모</h2>
+    <p class="hint">질문을 입력하고 보내세요. (Shift+Enter 줄바꿈, Enter 전송) · pg_2의 화면 데이터가 있으면 함께 전달됩니다.</p>
+
+    <div class="panel">
+        <div class="input-row">
+            <textarea id="prompt" placeholder="예) 100012 사무소의 최근 3개년 ROE 추세와 카카오뱅크 비교 분석해줘"></textarea>
+            <button id="sendBtn">보내기</button>
+        </div>
+
+        <div class="toolbar">
+            <label class="toggle" title="pg_2에서 저장된 화면 스냅샷(JSON)을 프롬프트 앞에 자동으로 첨부합니다.">
+                <input type="checkbox" id="usePg2" checked>
+                <span>pg_2 컨텍스트 자동 첨부</span>
+            </label>
+            <span class="sys" id="ctxInfo"></span>
+        </div>
+
+        <div class="log" id="log" aria-live="polite" aria-atomic="false"></div>
+    </div>
+</div>
+
+<script>
+    const $prompt = document.getElementById('prompt');
+    const $log = document.getElementById('log');
+    const $btn = document.getElementById('sendBtn');
+    const $usePg2 = document.getElementById('usePg2');
+    const $ctxInfo = document.getElementById('ctxInfo');
+
+    function nowHHMM() {
+        const d = new Date();
+        return d.toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'});
+    }
+
+    function append(role, text) {
+        const row = document.createElement('div');
+        row.className = 'msg ' + role;
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = text;
+        row.appendChild(bubble);
+
+        // 프리픽스 아이콘
+        const prefix = role === 'user' ? '👤 ' : role === 'assistant' ? '🤖 ' : '';
+        bubble.textContent = prefix + bubble.textContent;
+
+        // 타임스탬프(스크린리더용)
+        const sr = document.createElement('span');
+        sr.className = 'sys';
+        sr.style.marginLeft = '6px';
+        sr.textContent = ` · ${nowHHMM()}`;
+        bubble.appendChild(sr);
+
+        $log.appendChild(row);
+        $log.scrollTop = $log.scrollHeight; // 새 메시지로 스크롤
+    }
+
+    // pg_2 컨텍스트 존재/크기 표시
+    function refreshCtxInfo() {
+        const raw = localStorage.getItem('pg2_context');
+        if (!raw) {
+            $ctxInfo.textContent = 'pg_2 컨텍스트: 없음';
+            return;
+        }
+        try {
+            const kb = (new Blob([raw]).size / 1024).toFixed(1);
+            const j = JSON.parse(raw);
+            const id = j?.brc || '—';
+            const years = Array.isArray(j?.years) ? j.years.length : 0;
+            const metrics = Array.isArray(j?.metrics) ? j.metrics.length : 0;
+            $ctxInfo.textContent = `pg_2 컨텍스트: ${kb}KB · BRC ${id} · 연도 ${years} · 지표 ${metrics}`;
+        } catch {
+            $ctxInfo.textContent = 'pg_2 컨텍스트: 감지됨(형식 확인 필요)';
+        }
+    }
+    refreshCtxInfo();
+
+    // pg_2 컨텍스트를 프롬프트에 붙임
+    function buildMergedPrompt(userPrompt) {
+        if (!$usePg2.checked) return userPrompt;
+
+        const ctxRaw = localStorage.getItem('pg2_context');
+        if (!ctxRaw) return userPrompt;
+
+        // 토큰 보호를 위해 적당히 자르기
+        const MAX = 15000; // 필요시 조정
+        const ctx = ctxRaw.length > MAX ? (ctxRaw.slice(0, MAX) + ' ...[truncated]') : ctxRaw;
+
+        return `[pg_2_context]
+${ctx}
+
+[user_question]
+${userPrompt}`;
+    }
+
+    // Enter로 전송 (Shift+Enter는 줄바꿈)
+    $prompt.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            $btn.click();
+        }
+    });
+
+    $btn.addEventListener('click', async () => {
+        const prompt = $prompt.value.trim();
+        if (!prompt) return;
+
+        append('user', prompt);
+        $btn.disabled = true; $btn.textContent = '생각 중…';
+
+        try {
+            const mergedPrompt = buildMergedPrompt(prompt);
+
+            const res = await fetch('/api/ai/ask', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ prompt: mergedPrompt })
+            });
+
+            if (!res.ok) {
+                const t = await res.text();
+                append('assistant', `오류: ${res.status} ${res.statusText}\n${t}`);
+            } else {
+                const data = await res.json();
+                append('assistant', data.answer || '(빈 응답)');
+            }
+        } catch (e) {
+            append('assistant', '네트워크 오류: ' + e.message);
+        } finally {
+            $btn.disabled = false; $btn.textContent = '보내기';
+            $prompt.focus();
+        }
+    });
+
+    // 탭/새로고침으로 돌아왔을 때 컨텍스트 크기 다시 표시
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'pg2_context') refreshCtxInfo();
+    });
+</script>
+</body>
+</html>
