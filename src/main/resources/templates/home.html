@@ -33,15 +33,26 @@
 
             overflow-x: hidden
         }
+
         header {
             background: #f8f9fa;
-            box-sizing: border-box;      /* height에 padding 포함 */
-            padding: 0 1rem;             /* 세로 패딩 제거(가로만 유지) */
+            box-sizing: border-box; /* height에 padding 포함 */
+            padding: 0 1rem; /* 세로 패딩 제거(가로만 유지) */
             min-height: 80px;
             height: 92px;
         }
-        .logo-square img { display: block; }
-        header h1 { white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+        .logo-square img {
+            display: block;
+        }
+
+        header h1 {
+            white-space: nowrap;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         main {
             flex: 1 1 auto;
             min-height: 0;
@@ -428,6 +439,11 @@
         .mini-card-header .header-actions .input-group {
             flex-wrap: nowrap; /* 버튼/인풋 내부는 줄바꿈 금지 */
         }
+
+        .logo-square--lg {
+            width: 80px;
+            height: 80px;
+        }
     </style>
 </head>
 <body>
@@ -437,7 +453,7 @@
     </div>
     <h1 class="h4 mb-0 text-truncate" th:text="${#strings.isEmpty(pageTitle) ? '재무 대시보드' : pageTitle}"></h1>
     <!-- 오른쪽 끝 로고 -->
-    <div class="logo-square ms-auto" style="width:80px;height:80px;">
+    <div class="logo-square ms-auto logo-square--lg">
         <img th:src="@{/img/nh_nscs.png}" src="/img/nh_nscs.png" alt="NH NSCS" loading="lazy">
     </div>
 </header>
@@ -498,19 +514,25 @@
                                     <dl class="row g-2 small mb-2">
                                         <dt class="col-4 col-sm-3 text-muted">조합장</dt>
                                         <dd class="col-8 col-sm-9"
-                                            th:text="${brcInfos[0]?.ceoNm} ?: '—'">—</dd>
+                                            th:text="${brcInfos[0]?.ceoNm} ?: '—'">—
+                                        </dd>
 
                                         <dt class="col-4 col-sm-3 text-muted">설립일</dt>
                                         <dd class="col-8 col-sm-9"
-                                            th:text="${brcInfos[0] != null and !#strings.isEmpty(brcInfos[0].foundationDt) ? brcInfos[0].foundationDt : '—'}">—</dd>
+                                            th:text="${brcInfos[0] != null and !#strings.isEmpty(brcInfos[0].foundationDt) ? brcInfos[0].foundationDt : '—'}">
+                                            —
+                                        </dd>
 
                                         <dt class="col-4 col-sm-3 text-muted">직원수</dt>
                                         <dd class="col-8 col-sm-9"
-                                            th:text="${brcInfos[0]?.employees != null ? #numbers.formatInteger(brcInfos[0].employees,0) + '명' : '—'}">—</dd>
+                                            th:text="${brcInfos[0]?.employees != null ? #numbers.formatInteger(brcInfos[0].employees,0) + '명' : '—'}">
+                                            —
+                                        </dd>
 
                                         <dt class="col-4 col-sm-3 text-muted">주소</dt>
                                         <dd class="col-8 col-sm-9"
-                                            th:text="${brcInfos[0]?.address} ?: '—'">—</dd>
+                                            th:text="${brcInfos[0]?.address} ?: '—'">—
+                                        </dd>
                                     </dl>
 
                                     <!-- 소개글 위 구분선 -->
@@ -638,7 +660,7 @@
                         <tbody>
                         <!-- ========== 수익성 비율 ========== -->
                         <tr>
-                            <td rowspan="10">수익성 비율</td>
+                            <td rowspan="7">수익성 비율</td>
                             <td>순이자마진(%)</td>
                             <td th:each="y : ${years}" th:text="${(fr.get(y)?.netInterestMarginPct) ?: '—'}">—</td>
                         </tr>
@@ -653,18 +675,6 @@
                         <tr>
                             <td>자기자본이익률(%) - ROE</td>
                             <td th:each="y : ${years}" th:text="${(fr.get(y)?.returnOnEquityRoePct) ?: '—'}">—</td>
-                        </tr>
-                        <tr>
-                            <td>증분 자기자본이익률(%) - 1Y</td>
-                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.incrementalRoe1yPct) ?: '—'}">—</td>
-                        </tr>
-                        <tr>
-                            <td>증분 자기자본이익률(%) - 3Y</td>
-                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.incrementalRoe3yPct) ?: '—'}">—</td>
-                        </tr>
-                        <tr>
-                            <td>증분 자기자본이익률(%) - 5Y</td>
-                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.incrementalRoe5yPct) ?: '—'}">—</td>
                         </tr>
                         <tr>
                             <td>총자산순이익률(%) - ROA</td>
@@ -763,7 +773,7 @@
                             <td th:each="y : ${years}" th:text="${(fr.get(y)?.beneishMScore) ?: '—'}">—</td>
                         </tr>
                         <tr>
-                            <td>G-스코어</td>
+                            <td>모한람 G-스코어</td>
                             <td th:each="y : ${years}" th:text="${(fr.get(y)?.gScore) ?: '—'}">—</td>
                         </tr>
 
@@ -1223,7 +1233,7 @@
         const FUTURE_STEPS = 32;
 
         // 라벨: 과거 날짜들 + 빈칸(FUTURE_STEPS) + "12개월 후"
-        const labels = (hasCandles ? CANDLES.map(d=>d.time) : ['현재'])
+        const labels = (hasCandles ? CANDLES.map(d => d.time) : ['현재'])
             .concat(Array(FUTURE_STEPS).fill(''))
             .concat(['12개월 후']);
         const nowIndex = history.length - 1;
@@ -1365,7 +1375,12 @@
                 },
                 layout: {padding: {right: 160}},
                 scales: {
-                    x: {type: 'category',offset: true,grid: {display: false}, ticks: {maxRotation: 0, autoSkip: true, callback: (value, idx) => labels[idx] || ''}},
+                    x: {
+                        type: 'category',
+                        offset: true,
+                        grid: {display: false},
+                        ticks: {maxRotation: 0, autoSkip: true, callback: (value, idx) => labels[idx] || ''}
+                    },
                     y: {min: yMin - pad, max: yMax + pad, ticks: {callback: v => '₩' + nf.format(v)}}
                 }
             }
@@ -1771,7 +1786,6 @@
             c.update();
         });
     })();
-
 
 
     /* ===== Profit/Risk Tab ===== */
