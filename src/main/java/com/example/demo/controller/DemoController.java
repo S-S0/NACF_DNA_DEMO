@@ -116,16 +116,6 @@ public class DemoController {
     // AI테스트
     @RequestMapping(method = RequestMethod.GET, path = "/pg_2")
     public String openAi(Model model) {
-//        DemoSample sample = demoService.findByEno("19301062");
-//
-//        // 개별로 붙이는 방법
-//        model.addAttribute("eno", sample.getEno());
-//        model.addAttribute("empnm", sample.getEmpnm());
-//        model.addAttribute("brc", sample.getBrc());
-//        model.addAttribute("brnm", sample.getBrnm());
-//
-//        // DTO 통채로 붙이는 방법
-//        model.addAttribute("sample", sample);
         return "pg_2";
     }
 }
