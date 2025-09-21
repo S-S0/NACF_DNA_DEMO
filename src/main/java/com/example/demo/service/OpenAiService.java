@@ -5,6 +5,8 @@ import com.example.demo.domain.ServFinancialRatios;
 import com.example.demo.domain.dto.*;
 import com.example.demo.repository.DemoRepository;
 import com.example.demo.repository.FinancialRatiosRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -55,7 +57,7 @@ public class OpenAiService {
                 """;
 
         List<Map<String, Object>> rows = demoRepository.getFinancialRatios("707015");
-
+        System.out.println(rows.toString());
         // 요청 content.type 은 반드시 "input_text"
         ContentBlock userBlock = new ContentBlock("input_text", rows.toString());
         InputMessage userMessage = new InputMessage("user", List.of(userBlock));
