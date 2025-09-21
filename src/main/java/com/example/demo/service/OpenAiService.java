@@ -57,7 +57,7 @@ public class OpenAiService {
                 """;
 
         List<Map<String, Object>> rows = demoRepository.getFinancialRatios("707015");
-        System.out.println(rows.toString());
+        System.out.println(rows.toString()); // 디버그용
         // 요청 content.type 은 반드시 "input_text"
         ContentBlock userBlock = new ContentBlock("input_text", rows.toString());
         InputMessage userMessage = new InputMessage("user", List.of(userBlock));
