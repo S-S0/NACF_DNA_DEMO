@@ -31,7 +31,7 @@ public class DemoController {
     public String home(@RequestParam(name="brc", required=false) String brc, Model model) {
 
         // 페이지 타이틀
-        model.addAttribute("pageTitle", "우리농축협 손익위험예측 및 경영전략 생성 시스템");
+        model.addAttribute("pageTitle", "농ㆍ축협 손익위험예측 및 경영전략생성 시스템");
 
         // 사무소코드가 없을 경우 기본 방어로직 - 안동농협?
         if(brc == null) {
@@ -70,20 +70,11 @@ public class DemoController {
         } else {
             model.addAttribute("fr", Collections.emptyMap());
         }
-
         model.addAttribute("years", years);
-        model.addAttribute("corp", Map.of("name", brc + "농협")); // 사무소코드별 이름 정해야함
 
         // 세번째 탭 모델 ------------------------------------------------------------------
-        /* !!핵심지표 5개 바인딩할때 사용하시면 됩니다.!!
-        model.addAttribute("valuation", Map.of(
-                "per",         perValue,         // Double
-                "pbr",         pbrValue,         // Double
-                "evToSales",   evSalesValue,     // Double
-                "evToEbitda",  evEbitdaValue,    // Double
-                "evToEbit",    evEbitValue       // Double
-        ));
-        */
+        List<BrcValue> bv = demoService.valueByBRC(brc);
+        model.addAttribute("brcValues", bv);
 
         return "home";
     }
@@ -95,25 +86,14 @@ public class DemoController {
     }
 
     // ------------------------------------------------------------------
-    // AI테스트
+    // AI테스트용
     @RequestMapping(method = RequestMethod.GET, path = "/test")
     public String test(Model model) {
-//        DemoSample sample = demoService.findByEno("19301062");
-//
-//        // 개별로 붙이는 방법
-//        model.addAttribute("eno", sample.getEno());
-//        model.addAttribute("empnm", sample.getEmpnm());
-//        model.addAttribute("brc", sample.getBrc());
-//        model.addAttribute("brnm", sample.getBrnm());
-//
-//        // DTO 통채로 붙이는 방법
-//        model.addAttribute("sample", sample);
         return "test";
     }
-
     // ------------------------------------------------------------------
 // ------------------------------------------------------------------
-    // AI테스트
+    // chat.html 연동용
     @RequestMapping(method = RequestMethod.GET, path = "/pg_2")
     public String openAi(Model model) {
         return "pg_2";

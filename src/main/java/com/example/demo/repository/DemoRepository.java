@@ -130,4 +130,24 @@ public class DemoRepository {
 
         return descBrcs;
     }
+    public List<BrcValue> valueByBRC(String brc) {
+        // 파라미터 맵 설정
+        Map<String, Object> params = Collections.singletonMap("brc", brc);
+
+        // 쿼리 실행 및 결과 매핑
+        List<BrcValue> brcValues;
+        brcValues = jdbc.query(
+                DemoSqls.VALUE_BY_BRC,
+                params,
+                new BeanPropertyRowMapper<>(BrcValue.class)
+        );
+
+        return brcValues;
+    }
+
+    public List<Map<String, Object>> getFinancialRatios(String brc) {
+        Map<String, Object> params = Collections.singletonMap("brc", brc);
+
+        return jdbc.queryForList(DemoSqls.SERVING_FIN_RATIO, params);
+    }
 }

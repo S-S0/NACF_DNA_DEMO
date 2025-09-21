@@ -1,10 +1,15 @@
 package com.example.demo.service;
 
+import com.example.demo.domain.FinancialRatios;
+import com.example.demo.domain.ServFinancialRatios;
 import com.example.demo.domain.dto.*;
+import com.example.demo.repository.DemoRepository;
+import com.example.demo.repository.FinancialRatiosRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -16,19 +21,21 @@ public class OpenAiService {
     private final Integer maxOutputTokens;
     private final Double temperature;
     private final boolean enableWebSearchByDefault;
+    private final DemoRepository demoRepository;
 
     public OpenAiService(
             RestClient openAiRestClient,
             @Value("${openai.model}") String model,
             @Value("${openai.max-output-tokens:800}") Integer maxOutputTokens,
             @Value("${openai.temperature:0.2}") Double temperature,
-            @Value("${openai.enable-web-search:true}") boolean enableWebSearchByDefault // 필요시 yml에서 on/off
+            @Value("${openai.enable-web-search:true}") boolean enableWebSearchByDefault, FinancialRatiosRepository repo, DemoRepository demoRepository // 필요시 yml에서 on/off
     ) {
         this.client = openAiRestClient;
         this.model = model;
         this.maxOutputTokens = maxOutputTokens;
         this.temperature = temperature;
         this.enableWebSearchByDefault = enableWebSearchByDefault;
+        this.demoRepository = demoRepository;
     }
 
     /**
@@ -47,8 +54,10 @@ public class OpenAiService {
                 - 답변 포맷: 1)요약 2)핵심해설(불릿) 3)간단 예시/표(선택)
                 """;
 
+        List<Map<String, Object>> rows = demoRepository.getFinancialRatios("707015");
+
         // 요청 content.type 은 반드시 "input_text"
-        ContentBlock userBlock = new ContentBlock("input_text", userPrompt);
+        ContentBlock userBlock = new ContentBlock("input_text", rows.toString());
         InputMessage userMessage = new InputMessage("user", List.of(userBlock));
 
         // === tools 구성 ===
@@ -95,6 +104,6 @@ public class OpenAiService {
             }
         }
         String text = sb.toString();
-        return (text == null || text.isBlank()) ? "(텍스트 응답 없음)" : text.trim();
+        return text.isBlank() ? "(텍스트 응답 없음)" : text.trim();
     }
 }

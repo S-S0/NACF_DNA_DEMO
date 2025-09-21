@@ -45,4 +45,7 @@ public class DemoService {
 
     @Transactional(readOnly = true)
     public List<BrcInfo> descByBRC(String brc) { return repo.descByBRC(brc); }
+
+    @Transactional(readOnly = true)
+    public List<BrcValue> valueByBRC(String brc) { return repo.valueByBRC(brc); }
 }
