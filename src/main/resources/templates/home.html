@@ -897,7 +897,7 @@
                         </section>
                     </div>
 
-                    <div class="col-12 col-lg-6">
+                    <div class="col-12 col-lg-6 d-flex flex-column" style="min-height:0">
                         <!-- 전략생성옵션모음 시작 -->
                         <section class="mini-card mb-3">
                             <div class="mini-card-header">
@@ -1015,7 +1015,7 @@
 
                         </section>
                         <!-- 전략생성옵션모음 끝 -->
-                        <section class="mini-card">
+                        <section class="mini-card flex-grow-1 d-flex flex-column" style="min-height:0">
                             <div class="mini-card-header">
                                 <h3 class="mini-card-title mb-0">전략 결과</h3>
                                 <div class="btn-group btn-group-sm" role="group" aria-label="결과 패널 도구">
@@ -1025,7 +1025,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="mini-card-body h-220" style="overflow:auto">
+                            <div class="mini-card-body flex-grow-1" style="overflow:auto; min-height:240px">
                                 <div id="genaiOutput" class="small" style="white-space:pre-wrap" role="status"
                                      aria-live="polite">
                                     버튼을 눌러 전략을 생성하면 이 영역에 결과가 표시됩니다.
