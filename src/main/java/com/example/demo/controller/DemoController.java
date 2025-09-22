@@ -31,7 +31,7 @@ public class DemoController {
     public String home(@RequestParam(name="brc", required=false) String brc, Model model) {
 
         // 페이지 타이틀
-        model.addAttribute("pageTitle", "농ㆍ축협 손익위험예측 및 경영전략생성 시스템");
+        model.addAttribute("pageTitle", "NH 손익위험관리 및 AI 경영전략 생성시스템");
 
         // 사무소코드가 없을 경우 기본 방어로직 - 안동농협?
         if(brc == null) {
@@ -77,25 +77,5 @@ public class DemoController {
         model.addAttribute("brcValues", bv);
 
         return "home";
-    }
-
-    // 웹 페이지 개발용----------------------------------------------------
-    @RequestMapping(method = RequestMethod.GET, path = "/temp")
-    public String temp() {
-        return "temp";
-    }
-
-    // ------------------------------------------------------------------
-    // AI테스트용
-    @RequestMapping(method = RequestMethod.GET, path = "/test")
-    public String test(Model model) {
-        return "test";
-    }
-    // ------------------------------------------------------------------
-// ------------------------------------------------------------------
-    // chat.html 연동용
-    @RequestMapping(method = RequestMethod.GET, path = "/pg_2")
-    public String openAi(Model model) {
-        return "pg_2";
     }
 }

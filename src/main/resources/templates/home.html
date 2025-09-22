@@ -583,7 +583,8 @@
 
 <div class="body-header container-fluid d-flex align-items-center flex-wrap">
     <label class="form-label mb-0 fw-bold" for="officeCode">사무소코드</label>
-    <input aria-describedby="officeHelp" class="form-control form-control-sm" id="officeCode" inputmode="numeric" maxlength="6"
+    <input aria-describedby="officeHelp" class="form-control form-control-sm" id="officeCode" inputmode="numeric"
+           maxlength="6"
            oninput="if(this.value.length>6)this.value=this.value.slice(0,6);" pattern="[0-9]*" placeholder="6자리 숫자"
            style="max-width:150px"
            type="number">
@@ -670,7 +671,8 @@
                             <section aria-labelledby="factorTitle" class="p-3 factor-card border rounded-2 flex-grow-1">
                                 <div class="d-flex align-items-center mb-2">
                                     <h2 class="h6 fw-bold mb-0" id="factorTitle">팩터 분석</h2>
-                                    <button class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" data-bs-toggle="tooltip"
+                                    <button class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1"
+                                            data-bs-toggle="tooltip"
                                             title="6대 팩터(변동성·밸류·사이즈·모멘텀·베타·전망치) 상대 점수(0~100)" type="button">
                                         <span style="font-size:.85rem">❔</span></button>
                                 </div>
@@ -932,8 +934,8 @@
             <div class="tab-pane fade p-3" id="profit" role="tabpanel">
                 <!-- 경영전략 작업 영역 -->
 
-                <div class="row g-3">
-                    <div class="col-12 col-lg-6">
+                <div class="row g-3 align-items-stretch">
+                    <div class="col-12 col-lg-6 d-flex flex-column" style="min-height:0">
                         <section class="mini-card">
                             <div class="mini-card-header">
                                 <h3 class="mini-card-title mb-0">핵심 지표</h3>
@@ -993,28 +995,12 @@
                             </div>
                         </section>
 
-                        <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center mb-2 mt-3">
-                            <select class="form-select form-select-sm" id="pnlRange" style="max-width:160px">
-                                <option selected value="12">최근 12개월</option>
-                                <option value="24">최근 24개월</option>
-                                <option value="36">최근 36개월</option>
-                                <option value="all">전체</option>
-                            </select>
-                            <div aria-label="표시 단위" class="btn-group btn-group-sm" role="group">
-                                <button class="btn btn-outline-secondary active" id="pnlModeCum" type="button">누적
-                                </button>
-                                <button class="btn btn-outline-secondary" id="pnlModePer" type="button">기간</button>
-                            </div>
-                            <button class="btn btn-sm btn-outline-secondary" id="pnlExportPng" type="button">PNG 내보내기
-                            </button>
-                            <button class="btn btn-sm btn-outline-secondary" id="pnlResetZoom" type="button">줌 리셋
-                            </button>
-                        </div>
-                        <section class="mini-card mt-3">
+
+                        <section class="mini-card mt-3 flex-grow-1 d-flex flex-column" style="min-height:0">
                             <div class="mini-card-header">
                                 <h3 class="mini-card-title mb-0">연도별 핵심지표흐름</h3>
                             </div>
-                            <div class="mini-card-body h-320">
+                            <div class="mini-card-body flex-grow-1" style="overflow:auto; min-height:240px">
                                 <canvas aria-label="누적 손익 차트" id="pnlCurveChart" role="img"></canvas>
                             </div>
                         </section>
@@ -1034,7 +1020,8 @@
                                             <option value="aggressive">공격적</option>
                                         </select>
                                     </div>
-                                    <div aria-label="전략 실행 버튼" class="btn-group btn-group-sm strategy-actions flex-nowrap"
+                                    <div aria-label="전략 실행 버튼"
+                                         class="btn-group btn-group-sm strategy-actions flex-nowrap"
                                          role="group">
                                         <button class="btn btn-primary" id="btnGenStrategy" type="button">전략 생성</button>
                                         <button class="btn btn-outline-secondary" id="btnRiskAudit" type="button">리스크
@@ -1054,7 +1041,8 @@
                                     <!-- ▼▼▼ 전략 옵션 UI: 프롬프트 인풋 아래에 추가 ▼▼▼ -->
 
                                     <div class="dropdown" data-bs-auto-close="outside">
-                                        <button aria-expanded="false" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                        <button aria-expanded="false"
+                                                class="btn btn-sm btn-outline-secondary dropdown-toggle"
                                                 data-bs-toggle="dropdown" id="stratKindsBtn" type="button">
                                             전략유형 선택
                                         </button>
@@ -1128,30 +1116,33 @@
                                 </div>
 
                                 <div class="border-top my-2 w-100"></div>
-                                <div id="actionGuide" class="mt-2 small text-primary text-center"></div>
+                                <div class="mt-2 small text-primary text-center" id="actionGuide"></div>
                                 <!-- ▲▲▲ 전략 옵션 UI: 여기까지 ▲▲▲ -->
 
                             </div>
 
                         </section>
                         <!-- 전략생성옵션모음 끝 -->
-                        <section class="mini-card mt-3">
+                        <section class="mini-card flex-grow-1 d-flex flex-column" style="min-height:0">
                             <div class="mini-card-header">
                                 <h3 class="mini-card-title mb-0">생성형 AI 분석</h3>
                             </div>
-                            <div class="mini-card-body">
+                            <div class="mini-card-body flex-grow-1" style="overflow:auto; min-height:240px">
                                 <div class="input-row mb-2 d-flex gap-2 align-items-start">
                                     <!-- textarea 내부 텍스트는 비워둡니다 (공백/개행 X) -->
-                                    <textarea id="prompt" class="form-control flex-grow-1" rows="1"
-                                              placeholder="예) 현재 사무소 재무비율 분석해줘"></textarea>
+                                    <textarea class="form-control flex-grow-1" id="prompt"
+                                              placeholder="예) 현재 사무소 재무비율 분석해줘"
+                                              rows="1"></textarea>
 
-                                    <button id="sendBtn" class="btn btn-primary flex-shrink-0"
-                                            style="width: 120px;">보내기</button>
+                                    <button class="btn btn-primary flex-shrink-0" id="sendBtn"
+                                            style="width: 120px;">보내기
+                                    </button>
                                 </div>
                                 <div class="d-flex justify-content-between small text-muted mb-2">
                                     <span>Enter=전송 / Shift+Enter=줄바꿈</span>
                                 </div>
-                                <div class="log border rounded p-2" id="log" style="max-height:300px; overflow-y:auto; background:#fcfcfd"></div>
+                                <div class="log border rounded p-2" id="log"
+                                     style="overflow-y:auto; background:#fcfcfd"></div>
                             </div>
                         </section>
                     </div>
@@ -1947,7 +1938,7 @@
             });
         }
 
-        let pnlCurveChart = null, pnlDecompChart = null;
+        let pnlCurveChart = null;
         let pnlMode = 'cum';
         let pnlRange = '12';
         let decompMode = 'abs';
@@ -2051,83 +2042,6 @@
                     }
                 }
             });
-
-            // 손익 분해
-            const useStacks = (decompMode === 'pct') ? toPctStacks(decompStacks) : decompStacks;
-            const yTick = (decompMode === 'pct') ? (v => v + '%') : (v => '₩' + nf.format(v * 10000));
-            const decompCtx = document.getElementById('pnlDecompChart')?.getContext('2d');
-            if (decompCtx) {
-                if (!pnlDecompChart) {
-                    pnlDecompChart = new Chart(decompCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: decompLabels,
-                            datasets: [
-                                ...useStacks.map(s => ({
-                                    type: 'bar',
-                                    label: s.label,
-                                    data: s.data,
-                                    stack: 'stack',
-                                    order: 2
-                                })),
-                                {
-                                    type: 'line',
-                                    label: decompNetLbl,
-                                    data: decompNet,
-                                    yAxisID: 'y2',
-                                    order: 1,
-                                    pointRadius: 2,
-                                    tension: .25
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true, maintainAspectRatio: false,
-                            scales: {
-                                x: {stacked: true},
-                                y: {
-                                    stacked: true,
-                                    beginAtZero: true,
-                                    max: (decompMode === 'pct' ? 100 : undefined),
-                                    ticks: {callback: yTick}
-                                },
-                                y2: {
-                                    position: 'right',
-                                    grid: {drawOnChartArea: false},
-                                    ticks: {callback: v => '₩' + nf.format(v * 10000)}
-                                }
-                            },
-                            plugins: {legend: {position: 'bottom'}}
-                        }
-                    });
-                } else {
-                    // 업데이트 분기: 아예 덮어써서 길이 차이 문제도 회피
-                    pnlDecompChart.data.labels = decompLabels;
-                    pnlDecompChart.data.datasets = [
-                        ...useStacks.map(s => ({
-                            type: 'bar',
-                            label: s.label,
-                            data: s.data,
-                            stack: 'stack',
-                            order: 2,
-                            yAxisID: 'y'
-                        })),
-                        {
-                            type: 'line',
-                            label: decompNetLbl,
-                            data: decompNet,
-                            yAxisID: 'y2',
-                            order: 1,
-                            pointRadius: 2,
-                            tension: .25
-                        }
-                    ];
-                    pnlDecompChart.options.scales.y.ticks.callback = (decompMode === 'pct') ? (v => v + '%') : (v => '₩' + nf.format(v * 10000));
-                    pnlDecompChart.options.scales.y.beginAtZero = true;
-                    pnlDecompChart.options.scales.y.max = (decompMode === 'pct' ? 100 : undefined);
-                    pnlDecompChart.update();
-                }
-            }
         }
 
         // 이벤트 바인딩
@@ -2180,7 +2094,6 @@
                 buildOrUpdateAll();
             } else {
                 pnlCurveChart?.resize?.();
-                pnlDecompChart?.resize?.();
             }
         });
     })();
@@ -2190,18 +2103,9 @@
         const $prompt = document.getElementById('prompt');
         const $pnlRange = document.getElementById('pnlRange');
         const $modePer = document.getElementById('pnlModePer');
-        const $output = document.getElementById('genaiOutput');
 
         // ▼ 신규: 옵션 엘리먼트
         const $risk = document.getElementById('stratRisk');
-
-        function setOutputText(text) {
-            if ($output) $output.textContent = text;
-        }
-
-        function appendOutputText(text) {
-            if ($output) $output.textContent += text;
-        }
 
         // ▼ 전략 프리셋마다 권장 제약/설명을 매핑 (백엔드가 활용해도 됨)
         const STRATEGY_TEMPLATES = {
@@ -2318,11 +2222,15 @@
                     t.innerHTML = `<div class='d-flex'><div class='toast-body'>전략 옵션을 초기화했어요.</div>
         <button type='button' class='btn-close btn-close-white me-2 m-auto' data-bs-dismiss='toast'></button></div>`;
                     tc.appendChild(t);
-                    setTimeout(() => { t.classList.replace('show','hide'); setTimeout(() => t.remove(), 300); }, 1400);
+                    setTimeout(() => {
+                        t.classList.replace('show', 'hide');
+                        setTimeout(() => t.remove(), 300);
+                    }, 1400);
 
                 }
 
-            } catch (_) {}
+            } catch (_) {
+            }
         });
 
         document.getElementById('stratKindsMenu')?.addEventListener('change', renderPills);
@@ -2369,9 +2277,9 @@
         };
 
         // IIFE 끝부분에 추가 (전역으로 노출)
-        window.getSelectedKinds    = getSelectedKinds;
-        window.STRATEGY_TEMPLATES  = STRATEGY_TEMPLATES;
-        window.RISK_PROFILE_HINT   = RISK_PROFILE_HINT;
+        window.getSelectedKinds = getSelectedKinds;
+        window.STRATEGY_TEMPLATES = STRATEGY_TEMPLATES;
+        window.RISK_PROFILE_HINT = RISK_PROFILE_HINT;
 
 
         // ▼ 사람이 읽기 좋은 “요약 프롬프트” 생성 (선택한 옵션을 자연어로 합성)
@@ -2432,34 +2340,11 @@
             const title = (type === 'strategy:generate' ? '전략 생성'
                 : type === 'strategy:riskAudit' ? '리스크 점검'
                     : '리밸런싱 제안');
-
-            setOutputText(
-                `[${title}] 요청을 전송했습니다.${detail.naturalPrompt}(백엔드 연동 시 이 영역에 생성 결과가 렌더링됩니다.)`);
         }
 
         document.getElementById('btnGenStrategy')?.addEventListener('click', () => fire('strategy:generate'));
         document.getElementById('btnRiskAudit')?.addEventListener('click', () => fire('strategy:riskAudit'));
         document.getElementById('btnRebalance')?.addEventListener('click', () => fire('strategy:rebalance'));
-
-        document.getElementById('btnExportProfitPng')?.addEventListener('click', () => {
-            document.getElementById('pnlExportPng')?.click();
-        });
-        document.getElementById('btnResetProfitZoom')?.addEventListener('click', () => {
-            document.getElementById('pnlResetZoom')?.click();
-        });
-
-        // 결과 패널 도구
-        document.getElementById('btnCopyGenai')?.addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText($output?.innerText || $output?.textContent || '');
-                appendOutputText('\n\n(복사 완료)');
-            } catch (e) {
-                appendOutputText('\n\n(복사 실패: 브라우저 권한을 확인하세요)');
-            }
-        });
-        document.getElementById('btnClearGenai')?.addEventListener('click', () => {
-            setOutputText('결과가 여기에 표시됩니다.');
-        });
     })();
 
     // ===== Backend wiring placeholders =====
@@ -2486,14 +2371,13 @@
         // TODO
     });
 
-    const $prompt  = document.getElementById('prompt');
-    const $log     = document.getElementById('log');
-    const $btn     = document.getElementById('sendBtn');
-    const $office  = document.getElementById('officeCode');
-    const $ctxInfo = document.getElementById('ctxInfo');
+    const $prompt = document.getElementById('prompt');
+    const $log = document.getElementById('log');
+    const $btn = document.getElementById('sendBtn');
+    const $office = document.getElementById('officeCode');
 
     // URL ?brc=123456 있으면 officeCode에 자동 세팅
-    (function initBrcFromUrl(){
+    (function initBrcFromUrl() {
         const sp = new URLSearchParams(location.search);
         const urlBrc = (sp.get('brc') || '').trim();
         if (urlBrc && $office) {
@@ -2502,27 +2386,27 @@
     })();
 
     // ===== Chat helpers (define once, before append) =====
-    window.escapeHtml = function(s=''){
+    window.escapeHtml = function (s = '') {
         return s
-            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     };
-    window.linkify = function(s=''){
+    window.linkify = function (s = '') {
         return s.replace(/\bhttps?:\/\/[^\s<>()]+/g,
             url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
     };
-    window.formatBlocks = function(s=''){
+    window.formatBlocks = function (s = '') {
         s = s.replace(/```([\s\S]*?)```/g, (_, code) =>
             `<pre><code>${window.escapeHtml(code.trim())}</code></pre>`);
         s = s.replace(/`([^`]+?)`/g, (_, code) =>
             `<code>${window.escapeHtml(code)}</code>`);
         return s;
     };
-    window.maybeClamp = function(html){
-        const MAX_LEN = 1600; // 길면 '더 보기' 토글
-        if(html.length <= MAX_LEN) return html;
-        const head = html.slice(0,MAX_LEN), tail = html.slice(MAX_LEN);
-        const id = 'sx_'+Math.random().toString(36).slice(2);
+    window.maybeClamp = function (html) {
+        const MAX_LEN = 7000; // 길면 '더 보기' 토글
+        if (html.length <= MAX_LEN) return html;
+        const head = html.slice(0, MAX_LEN), tail = html.slice(MAX_LEN);
+        const id = 'sx_' + Math.random().toString(36).slice(2);
         return `
     <span>${head}</span>
     <span id="${id}" style="display:none">${tail}</span>
@@ -2532,40 +2416,19 @@
       else{ this.textContent='더 보기'; h.style.display='none'; }
     ">더 보기</a>`;
     };
-    function setCtxInfo(state, detail={}){
-        const el = window.$ctxInfo;
-        if(!el) return;
 
-        if(state === 'loading'){
-            const { brc, years } = detail;
-            el.textContent = `컨텍스트 불러오는 중… (brc ${brc} · 최근 ${years}개년)`;
-            el.classList.remove('text-danger','text-success');
-        } else if(state === 'ok'){
-            const { brc, years, bytes } = detail;
-            el.textContent = `컨텍스트 연결됨 · ${bytes?.toLocaleString?.() ?? bytes}B · brc ${brc} · ${years}개년`;
-            el.classList.remove('text-danger');
-            el.classList.add('text-success');
-        } else if(state === 'fail'){
-            const { message } = detail;
-            el.textContent = `컨텍스트 없음(서버 응답 실패)${message ? ' · ' + message : ''}`;
-            el.classList.remove('text-success');
-            el.classList.add('text-danger');
-        } else if(state === 'idle'){
-            el.textContent = '컨텍스트 준비 중…';
-            el.classList.remove('text-danger','text-success');
-        }
+    function nowHHMM() {
+        const d = new Date();
+        return d.toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit'});
     }
 
-    function nowHHMM(){
-        const d=new Date(); return d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
-    }
-    function append(role, text){
+    function append(role, text) {
         const row = document.createElement('div');
         row.className = 'msg ' + (role || 'assistant');
 
         const av = document.createElement('div');
         av.className = 'avatar';
-        av.textContent = role==='user' ? '👤' : role==='system' ? '⚙' : '🤖';
+        av.textContent = role === 'user' ? '👤' : role === 'system' ? '⚙' : '🤖';
 
         const bb = document.createElement('div');
         bb.className = 'bubble';
@@ -2575,59 +2438,28 @@
 
         bb.innerHTML = `${html} <span class="meta">· ${nowHHMM()}</span>`;
 
-        if(role==='user'){ row.appendChild(bb); row.appendChild(av); }
-        else{ row.appendChild(av); row.appendChild(bb); }
+        if (role === 'user') {
+            row.appendChild(bb);
+            row.appendChild(av);
+        } else {
+            row.appendChild(av);
+            row.appendChild(bb);
+        }
 
         $log.appendChild(row);
         $log.scrollTop = $log.scrollHeight;
     }
 
-    function getBrc(){
+    function getBrc() {
         const v = ($office?.value || '').trim();
         return (v && /^\d{6}$/.test(v)) ? v : '707015';
     }
 
-    async function fetchFinContext(brc, years=5){
+    async function fetchFinContext(brc, years = 5) {
         const url = `/api/finratio/serving/context?brc=${encodeURIComponent(brc)}&years=${years}`;
         const res = await fetch(url);
-        if(!res.ok) throw new Error(`컨텍스트 조회 실패: ${res.status}`);
+        if (!res.ok) throw new Error(`컨텍스트 조회 실패: ${res.status}`);
         return await res.text();
-    }
-
-    // 전략 옵션을 한 번에 수집해서 JSON으로 만들기
-    function buildStrategyOptions() {
-        const kinds = (typeof getSelectedKinds === 'function') ? getSelectedKinds() : [];
-        const riskEl = document.getElementById('stratRisk');
-        const risk = riskEl?.value || 'moderate';
-        const horizon = document.getElementById('pnlRange')?.value || '12';
-        const mode = document.getElementById('pnlModePer')?.classList.contains('active') ? 'per' : 'cum';
-
-        let naturalPrompt = "";
-        try {
-            // 사용자가 프롬프트를 비워도 ""가 들어가도록(빈 상태 유지)
-            naturalPrompt = (typeof buildNaturalPrompt === 'function')
-                ? (buildNaturalPrompt({
-                    prompt: (document.getElementById('prompt')?.value || '').trim(),
-                    kinds, risk, horizon, mode
-                }) || "")
-                : "";
-        } catch (_) { /* 안전 가드 */ }
-
-        // back-end가 쓰기 좋은 힌트/템플릿도 함께 제공
-        const hints = (typeof RISK_PROFILE_HINT !== 'undefined') ? (RISK_PROFILE_HINT[risk] || {}) : {};
-        const templates = (typeof STRATEGY_TEMPLATES !== 'undefined')
-            ? kinds.map(k => STRATEGY_TEMPLATES[k] || {label: k})
-            : kinds.map(k => ({label: k}));
-
-        return {
-            kinds,          // []일 수 있음(선택 안 했을 때 그대로 빈 배열)
-            risk,           // 항상 존재(기본 moderate)
-            horizon,        // "12" 등
-            mode,           // "per" | "cum"
-            hints,          // 리스크 가이드 요약
-            templates,      // 선택한 전략 템플릿 메타
-            naturalPrompt   // 사람이 읽기 좋은 요약 (비어있을 수 있음)
-        };
     }
 
 
@@ -2649,19 +2481,19 @@
         const labels = (window.STRATEGY_TEMPLATES)
             ? kinds.map(k => window.STRATEGY_TEMPLATES[k]?.label || k)
             : kinds;
-        const riskKo = {conservative:'보수적', moderate:'중립', aggressive:'공격적'}[risk] || risk;
+        const riskKo = {conservative: '보수적', moderate: '중립', aggressive: '공격적'}[risk] || risk;
         const naturalPrompt = [
             labels.length ? `요청 전략: ${labels.join(', ')} (${riskKo})` : '',
-            `분석 구간: ${horizon==='all'?'전체':horizon+'개월'} / 표시단위: ${mode==='per'?'기간':'누적'}`,
+            `분석 구간: ${horizon === 'all' ? '전체' : horizon + '개월'} / 표시단위: ${mode === 'per' ? '기간' : '누적'}`,
             (hints && (hints.targetVol || hints.maxDrawdown || hints.turnover))
-                ? `리스크 가이드: 변동성 ${hints.targetVol||'-'}, MDD ${hints.maxDrawdown||'-'}, 회전율 ${hints.turnover||'-'}`
+                ? `리스크 가이드: 변동성 ${hints.targetVol || '-'}, MDD ${hints.maxDrawdown || '-'}, 회전율 ${hints.turnover || '-'}`
                 : ''
         ].filter(Boolean).join('\n');
 
-        return { kinds, risk, horizon, mode, hints, templates, naturalPrompt };
+        return {kinds, risk, horizon, mode, hints, templates, naturalPrompt};
     }
 
-    async function buildMergedPromptAsync(userPrompt){
+    async function buildMergedPromptAsync(userPrompt) {
         const brc = getBrc();
         const years = 5;
 
@@ -2680,12 +2512,8 @@ ${stratJson}`;
 
         // 컨텍스트 가져오기 + 상태표시 갱신
         try {
-            setCtxInfo('loading', { brc, years });
-
             const ctx = await fetchFinContext(brc, years);
             const bytes = (typeof ctx === 'string') ? ctx.length : new Blob([ctx]).size;
-
-            setCtxInfo('ok', { brc, years, bytes });
 
             return `[client_vars]
 brc: ${brc}
@@ -2696,9 +2524,7 @@ ${ctx}${stratSection}
 
 [user_question]
 ${userPrompt}`;
-        } catch(e) {
-            setCtxInfo('fail', { message: e?.message });
-
+        } catch (e) {
             // 컨텍스트 없을 때도 질문은 진행
             return `[client_vars]
 brc: ${brc}${stratSection}
@@ -2709,42 +2535,47 @@ ${userPrompt}`;
     }
 
 
-
-
     // Enter로 전송 (Shift+Enter는 줄바꿈)
-    $prompt.addEventListener('keydown',(e)=>{
-        if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $btn.click(); }
+    $prompt.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            $btn.click();
+        }
     });
 
-    $btn.addEventListener('click', async ()=>{
+    $btn.addEventListener('click', async () => {
         let prompt = $prompt.value;
-        if(!prompt){
+        if (!prompt) {
             prompt = '전략 옵션 기반으로 분석해줘';
         }
 
         append('user', prompt);   // 화면에 실제 들어가는 값도 기본 프롬프트로
         $prompt.value = '';
 
-        $btn.disabled = true; const old = $btn.textContent; $btn.textContent='생각 중…';
+        $btn.disabled = true;
+        const old = $btn.textContent;
+        $btn.textContent = '생각 중…';
 
-        try{
+        try {
             const mergedPrompt = await buildMergedPromptAsync(prompt);
             console.log("최종 mergedPrompt:", mergedPrompt);
             const res = await fetch('/api/ai/ask', {
-                method:'POST', headers:{'Content-Type':'application/json'},
-                body: JSON.stringify({ prompt: mergedPrompt })
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({prompt: mergedPrompt})
             });
-            if(!res.ok){
+            if (!res.ok) {
                 const t = await res.text();
                 append('assistant', `오류: ${res.status} ${res.statusText}\n${t}`);
-            }else{
+            } else {
                 const data = await res.json();
                 append('assistant', data?.answer || '(빈 응답)');
             }
-        }catch(e){
+        } catch (e) {
             append('assistant', '네트워크 오류: ' + e.message);
-        }finally{
-            $btn.disabled=false; $btn.textContent=old; $prompt.focus();
+        } finally {
+            $btn.disabled = false;
+            $btn.textContent = old;
+            $prompt.focus();
         }
     });
 
@@ -2777,17 +2608,17 @@ ${userPrompt}`;
         });
     })();
 
-    (function actionGuideWiring(){
+    (function actionGuideWiring() {
         const $risk = document.getElementById('stratRisk');
         const $guide = document.getElementById('actionGuide');
         let lastAction = null; // 'generate' | 'risk' | 'rebalance' 중 최근 액션 저장
 
-        const RISK_KO = { conservative: '보수적', moderate: '중립', aggressive: '공격적' };
-        const ACTION_KO = { generate: '전략 생성', risk: '리스크 점검', rebalance: '리밸런싱 제안' };
+        const RISK_KO = {conservative: '보수적', moderate: '중립', aggressive: '공격적'};
+        const ACTION_KO = {generate: '전략 생성', risk: '리스크 점검', rebalance: '리밸런싱 제안'};
 
-        function setActionGuide(actionKey){
+        function setActionGuide(actionKey) {
             lastAction = actionKey;
-            if(!$guide) return;
+            if (!$guide) return;
             const risk = $risk?.value || 'moderate';
             const riskKo = RISK_KO[risk] || risk;
             const actionKo = ACTION_KO[actionKey] || '';
@@ -2800,7 +2631,9 @@ ${userPrompt}`;
         document.getElementById('btnRebalance')?.addEventListener('click', () => setActionGuide('rebalance'));
 
         // 리스크가 바뀌면, 마지막으로 눌렀던 액션 기준으로 문구만 갱신
-        $risk?.addEventListener('change', () => { if(lastAction) setActionGuide(lastAction); });
+        $risk?.addEventListener('change', () => {
+            if (lastAction) setActionGuide(lastAction);
+        });
 
         setActionGuide('generate');
     })();
