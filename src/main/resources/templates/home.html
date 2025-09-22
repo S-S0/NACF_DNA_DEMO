@@ -454,6 +454,8 @@
             display: flex;
             flex-direction: column;
             gap: 10px; /* 메시지 간격 */
+            height: 400px;
+            overflow-y: auto;
         }
 
         /* 한 줄 전체(아바타 + 말풍선) */
@@ -1047,6 +1049,8 @@
                             <div class="mini-card-body">
 
                                 <div class="d-flex flex-wrap gap-2 justify-content-between align-items-start mb-2">
+
+
                                     <!-- ▼▼▼ 전략 옵션 UI: 프롬프트 인풋 아래에 추가 ▼▼▼ -->
 
                                     <div class="dropdown" data-bs-auto-close="outside">
@@ -1120,7 +1124,11 @@
                                         </div>
                                     </div>
                                     <div class="ms-2 d-flex flex-wrap gap-1" id="kindsPills"></div>
+
                                 </div>
+
+                                <div class="border-top my-2 w-100"></div>
+                                <div id="actionGuide" class="mt-2 small text-primary text-center"></div>
                                 <!-- ▲▲▲ 전략 옵션 UI: 여기까지 ▲▲▲ -->
 
                             </div>
@@ -1132,10 +1140,13 @@
                                 <h3 class="mini-card-title mb-0">생성형 AI 분석</h3>
                             </div>
                             <div class="mini-card-body">
-                                <div class="input-row mb-2">
-                                    <textarea class="form-control" id="prompt" placeholder="예) 현재 사무소 재무비율 분석해줘" rows="3">
-                                    </textarea>
-                                    <button class="btn btn-primary" id="sendBtn">보내기</button>
+                                <div class="input-row mb-2 d-flex gap-2 align-items-start">
+                                    <!-- textarea 내부 텍스트는 비워둡니다 (공백/개행 X) -->
+                                    <textarea id="prompt" class="form-control flex-grow-1" rows="1"
+                                              placeholder="예) 현재 사무소 재무비율 분석해줘"></textarea>
+
+                                    <button id="sendBtn" class="btn btn-primary flex-shrink-0"
+                                            style="width: 120px;">보내기</button>
                                 </div>
                                 <div class="d-flex justify-content-between small text-muted mb-2">
                                     <span>Enter=전송 / Shift+Enter=줄바꿈</span>
@@ -1156,6 +1167,7 @@
 <!-- Inline App Script -->
 <script th:inline="javascript">
 
+    let skipStrategyOptions = false;
     // 공통 유틸: 어떤 값이 와도 배열로 보정
     const asArray = (x) => Array.isArray(x) ? x : (x ? [x] : []);
     /* ===== Bootstrap Tooltip ===== */
@@ -2172,9 +2184,10 @@
             }
         });
     })();
+
     /* ===== Strategy buttons & GenAI output (single source of truth) ===== */
     (function () {
-        const $prompt = document.getElementById('stratPrompt');
+        const $prompt = document.getElementById('prompt');
         const $pnlRange = document.getElementById('pnlRange');
         const $modePer = document.getElementById('pnlModePer');
         const $output = document.getElementById('genaiOutput');
@@ -2472,6 +2485,7 @@
         console.log('strategy:rebalance payload', e.detail);
         // TODO
     });
+
     const $prompt  = document.getElementById('prompt');
     const $log     = document.getElementById('log');
     const $btn     = document.getElementById('sendBtn');
@@ -2703,9 +2717,14 @@ ${userPrompt}`;
     });
 
     $btn.addEventListener('click', async ()=>{
-        const prompt = $prompt.value.trim();
-        if(!prompt) return;
-        append('user', prompt);
+        let prompt = $prompt.value;
+        if(!prompt){
+            prompt = '전략 옵션 기반으로 분석해줘';
+        }
+
+        append('user', prompt);   // 화면에 실제 들어가는 값도 기본 프롬프트로
+        $prompt.value = '';
+
         $btn.disabled = true; const old = $btn.textContent; $btn.textContent='생각 중…';
 
         try{
@@ -2728,6 +2747,13 @@ ${userPrompt}`;
             $btn.disabled=false; $btn.textContent=old; $prompt.focus();
         }
     });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const ta = document.getElementById('prompt');
+        if (ta) ta.value = ''; // HTML에 들어간 들여쓰기/개행 제거
+    });
+
+
     // === [추가] 전략 액션 버튼 색상(활성) 토글 ===
     (function attachStrategyActiveToggle() {
         const ids = ['btnGenStrategy', 'btnRiskAudit', 'btnRebalance'];
@@ -2749,6 +2775,34 @@ ${userPrompt}`;
             if (!b) return;
             b.addEventListener('click', () => activate(b));
         });
+    })();
+
+    (function actionGuideWiring(){
+        const $risk = document.getElementById('stratRisk');
+        const $guide = document.getElementById('actionGuide');
+        let lastAction = null; // 'generate' | 'risk' | 'rebalance' 중 최근 액션 저장
+
+        const RISK_KO = { conservative: '보수적', moderate: '중립', aggressive: '공격적' };
+        const ACTION_KO = { generate: '전략 생성', risk: '리스크 점검', rebalance: '리밸런싱 제안' };
+
+        function setActionGuide(actionKey){
+            lastAction = actionKey;
+            if(!$guide) return;
+            const risk = $risk?.value || 'moderate';
+            const riskKo = RISK_KO[risk] || risk;
+            const actionKo = ACTION_KO[actionKey] || '';
+            $guide.textContent = `${riskKo} ${actionKo}이 요청되었습니다. 보내기 버튼을 누르세요.`;
+        }
+
+        // 버튼 클릭 시 안내문 업데이트
+        document.getElementById('btnGenStrategy')?.addEventListener('click', () => setActionGuide('generate'));
+        document.getElementById('btnRiskAudit')?.addEventListener('click', () => setActionGuide('risk'));
+        document.getElementById('btnRebalance')?.addEventListener('click', () => setActionGuide('rebalance'));
+
+        // 리스크가 바뀌면, 마지막으로 눌렀던 액션 기준으로 문구만 갱신
+        $risk?.addEventListener('change', () => { if(lastAction) setActionGuide(lastAction); });
+
+        setActionGuide('generate');
     })();
 </script>
 
