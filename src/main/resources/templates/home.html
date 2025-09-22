@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title th:text="${#strings.isEmpty(pageTitle) ? '재무 대시보드' : pageTitle}"></title>
 
     <!-- Bootstrap (CDN) -->
@@ -444,27 +444,148 @@
             width: 80px;
             height: 80px;
         }
+
+        /* ===== Chat Log (nice bubbles) ===== */
+        #log {
+            background: #f7f8fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* 메시지 간격 */
+        }
+
+        /* 한 줄 전체(아바타 + 말풍선) */
+        #log .msg {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            max-width: 100%;
+        }
+
+        /* 역할별 정렬 */
+        #log .msg.user {
+            justify-content: flex-end;
+        }
+
+        #log .msg.assistant {
+            justify-content: flex-start;
+        }
+
+        /* 아바타 */
+        #log .avatar {
+            width: 28px;
+            height: 28px;
+            flex: 0 0 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            background: #dee2e6;
+            color: #495057;
+            user-select: none;
+        }
+
+        #log .msg.user .avatar {
+            background: #0d6efd;
+            color: #fff;
+        }
+
+        #log .msg.system .avatar {
+            background: #adb5bd;
+            color: #fff;
+        }
+
+        /* 말풍선 */
+        #log .bubble {
+            max-width: min(72ch, 92%);
+            padding: 10px 12px;
+            border-radius: 14px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
+            white-space: pre-wrap; /* 줄바꿈 유지 */
+            word-break: break-word; /* 한국어/긴단어 줄바꿈 */
+            position: relative;
+            line-height: 1.45;
+            font-size: .95rem;
+        }
+
+        /* 역할별 색감 */
+        #log .msg.user .bubble {
+            background: #0d6efd;
+            color: #fff;
+            border-bottom-right-radius: 6px;
+        }
+
+        #log .msg.assistant .bubble {
+            background: #ffffff;
+            color: #212529;
+            border-bottom-left-radius: 6px;
+        }
+
+        #log .msg.system .bubble {
+            background: #fff3cd;
+            color: #7a6400;
+            border-bottom-left-radius: 6px;
+        }
+
+        /* 타임스탬프/작은 정보 */
+        #log .meta {
+            display: inline-block;
+            font-size: .78rem;
+            color: #868e96;
+            margin-left: .4rem;
+        }
+
+        /* 코드/인라인코드 */
+        #log .bubble code {
+            background: rgba(33, 37, 41, .06);
+            padding: 0 .25em;
+            border-radius: 4px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+
+        #log .bubble pre {
+            margin: .4rem 0 0;
+            background: #0b0c0e;
+            color: #e9ecef;
+            padding: .75rem;
+            border-radius: 10px;
+            overflow: auto;
+            font-size: .85rem;
+        }
+
+        /* 긴 답변 접기(토글 앵커) */
+        #log .show-more {
+            display: inline-block;
+            margin-top: .4rem;
+            font-size: .85rem;
+            color: #0d6efd;
+            cursor: pointer;
+            user-select: none;
+        }
     </style>
 </head>
 <body>
 <header class="container-fluid d-flex align-items-center gap-3 flex-nowrap">
     <div class="logo-square">
-        <img th:src="@{/img/nh_symbol.gif}" src="/img/nh_symbol.gif" alt="NH 로고" loading="lazy">
+        <img alt="NH 로고" loading="lazy" src="/img/nh_symbol.gif" th:src="@{/img/nh_symbol.gif}">
     </div>
     <h1 class="h4 mb-0 text-truncate" th:text="${#strings.isEmpty(pageTitle) ? '재무 대시보드' : pageTitle}"></h1>
     <!-- 오른쪽 끝 로고 -->
     <div class="logo-square ms-auto logo-square--lg">
-        <img th:src="@{/img/nh_nscs.png}" src="/img/nh_nscs.png" alt="NH NSCS" loading="lazy">
+        <img alt="NH NSCS" loading="lazy" src="/img/nh_nscs.png" th:src="@{/img/nh_nscs.png}">
     </div>
 </header>
 
 <div class="body-header container-fluid d-flex align-items-center flex-wrap">
     <label class="form-label mb-0 fw-bold" for="officeCode">사무소코드</label>
-    <input id="officeCode" type="number" inputmode="numeric" pattern="[0-9]*" maxlength="6"
-           class="form-control form-control-sm" placeholder="6자리 숫자" style="max-width:150px"
-           aria-describedby="officeHelp"
-           oninput="if(this.value.length>6)this.value=this.value.slice(0,6);">
-    <small id="officeHelp" class="text-muted ms-1">숫자 6자리</small>
+    <input aria-describedby="officeHelp" class="form-control form-control-sm" id="officeCode" inputmode="numeric" maxlength="6"
+           oninput="if(this.value.length>6)this.value=this.value.slice(0,6);" pattern="[0-9]*" placeholder="6자리 숫자"
+           style="max-width:150px"
+           type="number">
+    <small class="text-muted ms-1" id="officeHelp">숫자 6자리</small>
     <button class="btn btn-sm btn-primary" type="button">확인</button>
 </div>
 
@@ -472,13 +593,13 @@
     <div class="content-container">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#main" role="tab">메인</button>
+                <button class="nav-link active" data-bs-target="#main" data-bs-toggle="tab" role="tab">메인</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#ratio" role="tab">재무비율</button>
+                <button class="nav-link" data-bs-target="#ratio" data-bs-toggle="tab" role="tab">재무비율</button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#profit" role="tab">손익/위험</button>
+                <button class="nav-link" data-bs-target="#profit" data-bs-toggle="tab" role="tab">손익/위험</button>
             </li>
         </ul>
 
@@ -486,12 +607,12 @@
 
         <div class="tab-content mt-3">
             <!-- Main -->
-            <div id="main" class="tab-pane fade show active" role="tabpanel">
+            <div class="tab-pane fade show active" id="main" role="tabpanel">
                 <div class="row g-3">
                     <aside class="col-lg-3 col-md-4">
                         <div class="d-flex flex-column gap-3 h-100">
-                            <section class="p-3 border bg-light rounded-2" aria-labelledby="priceIntroTitle">
-                                <div class="price-info" id="priceIntroTitle" aria-label="현재 가격 정보">
+                            <section aria-labelledby="priceIntroTitle" class="p-3 border bg-light rounded-2">
+                                <div aria-label="현재 가격 정보" class="price-info" id="priceIntroTitle">
                                     <!-- 가격 숫자 -->
                                     <span class="price-big" id="price-now"
                                           th:text="${#numbers.formatInteger((quote?.price) ?: 22500, 0)}">22,500</span>
@@ -503,8 +624,8 @@
                                     <span class="price-change visually-hidden"
                                           th:classappend="${(quote?.changePercent ?: 0) >= 0} ? ' positive' : ' negative'"
                                           th:text="${(quote?.changePercent) != null ? #numbers.formatDecimal(quote.changePercent, 1, 2) + '%' : '-0.56% ▼ ₩500'}">-0.56% ▼ ₩500</span>
-                                    <span id="price-change-pct" class="change-badge" aria-label="전일 대비 등락률">--%</span>
-                                    <span id="price-change-abs" class="change-badge" aria-label="전일 대비 금액">--</span>
+                                    <span aria-label="전일 대비 등락률" class="change-badge" id="price-change-pct">--%</span>
+                                    <span aria-label="전일 대비 금액" class="change-badge" id="price-change-abs">--</span>
                                 </div>
                                 <div class="mt-3">
                                     <h2 class="h6 fw-bold mb-1">소개</h2>
@@ -544,15 +665,15 @@
                                 </div>
                             </section>
 
-                            <section class="p-3 factor-card border rounded-2 flex-grow-1" aria-labelledby="factorTitle">
+                            <section aria-labelledby="factorTitle" class="p-3 factor-card border rounded-2 flex-grow-1">
                                 <div class="d-flex align-items-center mb-2">
-                                    <h2 id="factorTitle" class="h6 fw-bold mb-0">팩터 분석</h2>
-                                    <button class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" type="button"
-                                            data-bs-toggle="tooltip" title="6대 팩터(변동성·밸류·사이즈·모멘텀·베타·전망치) 상대 점수(0~100)">
+                                    <h2 class="h6 fw-bold mb-0" id="factorTitle">팩터 분석</h2>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2 py-0 px-1" data-bs-toggle="tooltip"
+                                            title="6대 팩터(변동성·밸류·사이즈·모멘텀·베타·전망치) 상대 점수(0~100)" type="button">
                                         <span style="font-size:.85rem">❔</span></button>
                                 </div>
                                 <div class="factor-body">
-                                    <canvas id="factorChart" aria-label="팩터 분석 차트" role="img"></canvas>
+                                    <canvas aria-label="팩터 분석 차트" id="factorChart" role="img"></canvas>
                                 </div>
                             </section>
                         </div>
@@ -561,20 +682,20 @@
                     <div class="col-lg-9 col-md-8">
                         <section class="p-3 border bg-white rounded-2 h-100 d-flex flex-column">
                             <div class="candle-container border-bottom p-2">
-                                <div id="custom_candle_chart" aria-label="캔들 차트" role="img"></div>
+                                <div aria-label="캔들 차트" id="custom_candle_chart" role="img"></div>
                             </div>
 
-                            <section class="outlook-card" aria-labelledby="outlookTitle">
+                            <section aria-labelledby="outlookTitle" class="outlook-card">
                                 <div class="outlook-header">
                                     <div class="d-flex align-items-center gap-2">
-                                        <h3 id="outlookTitle" class="outlook-title mb-0">전문가 전망치</h3>
+                                        <h3 class="outlook-title mb-0" id="outlookTitle">전문가 전망치</h3>
                                         <span class="text-muted" data-bs-toggle="tooltip"
                                               title="애널리스트 목표가 기준 12개월 전망">❔</span>
                                     </div>
                                     <div class="outlook-tabs btn-group btn-group-sm" role="group">
-                                        <button class="btn btn-success active" type="button" disabled>12개월 전망</button>
-                                        <button class="btn btn-outline-secondary" type="button" disabled>전망 분포</button>
-                                        <button class="btn btn-outline-secondary" type="button" disabled>전망치 추이</button>
+                                        <button class="btn btn-success active" disabled type="button">12개월 전망</button>
+                                        <button class="btn btn-outline-secondary" disabled type="button">전망 분포</button>
+                                        <button class="btn btn-outline-secondary" disabled type="button">전망치 추이</button>
                                     </div>
                                 </div>
                                 <div class="outlook-body">
@@ -583,18 +704,18 @@
                             </section>
 
                             <div class="lower-box p-2">
-                                <div class="sub-divider" role="separator" aria-label="보조 지표 구분선"></div>
+                                <div aria-label="보조 지표 구분선" class="sub-divider" role="separator"></div>
                                 <div class="row g-3">
                                     <div class="col-12 col-lg-4">
                                         <section class="mini-card">
                                             <div class="mini-card-header">
                                                 <h3 class="mini-card-title mb-0">손익현황</h3>
-                                                <div class="btn-group btn-group-sm" role="group" aria-label="값 보기 전환">
-                                                    <button id="mixAbsBtn" type="button"
-                                                            class="btn btn-outline-secondary active">절대값
+                                                <div aria-label="값 보기 전환" class="btn-group btn-group-sm" role="group">
+                                                    <button class="btn btn-outline-secondary active" id="mixAbsBtn"
+                                                            type="button">절대값
                                                     </button>
-                                                    <button id="mixPctBtn" type="button"
-                                                            class="btn btn-outline-secondary">비율화
+                                                    <button class="btn btn-outline-secondary" id="mixPctBtn"
+                                                            type="button">비율화
                                                     </button>
                                                 </div>
                                             </div>
@@ -633,10 +754,10 @@
             </div>
 
             <!-- Ratio -->
-            <div id="ratio" class="tab-pane fade" role="tabpanel">
+            <div class="tab-pane fade" id="ratio" role="tabpanel">
                 <div class="mb-2 d-flex gap-2 justify-content-end align-items-center flex-wrap">
-                    <select id="yearRange" class="form-select form-select-sm" style="max-width:160px">
-                        <option value="5" selected>최근 5개년</option>
+                    <select class="form-select form-select-sm" id="yearRange" style="max-width:160px">
+                        <option selected value="5">최근 5개년</option>
                         <option value="3">최근 3개년</option>
                     </select>
                     <button class="btn btn-sm btn-outline-secondary" id="btnResetZoom" type="button">줌 리셋</button>
@@ -645,7 +766,7 @@
                     <button class="btn btn-sm btn-danger" onclick="clearAll()" type="button">전체 지표 제거</button>
                 </div>
                 <div class="chart-wrapper mb-3">
-                    <canvas id="stockChart" aria-label="재무비율 선택 차트" role="img"></canvas>
+                    <canvas aria-label="재무비율 선택 차트" id="stockChart" role="img"></canvas>
                 </div>
 
                 <div class="table-responsive">
@@ -806,7 +927,7 @@
             </div>
 
             <!-- Profit -->
-            <div id="profit" class="tab-pane fade p-3" role="tabpanel">
+            <div class="tab-pane fade p-3" id="profit" role="tabpanel">
                 <!-- 경영전략 작업 영역 -->
 
                 <div class="row g-3">
@@ -818,7 +939,7 @@
                             <div class="p-3">
                                 <div class="row g-3">
                                     <div class="col-6 col-lg-6">
-                                        <div class="risk-kpi" aria-label="PER">
+                                        <div aria-label="PER" class="risk-kpi">
                                             <div class="risk-kpi-label">PER</div>
                                             <div class="risk-kpi-value" id="kpiPER"
                                                  th:text="${#numbers.formatDecimal(brcValues[4].per ?: null, 1, 2)} ?: '--배'">
@@ -828,7 +949,7 @@
                                     </div>
 
                                     <div class="col-6 col-lg-6">
-                                        <div class="risk-kpi" aria-label="PBR">
+                                        <div aria-label="PBR" class="risk-kpi">
                                             <div class="risk-kpi-label">PBR</div>
                                             <div class="risk-kpi-value" id="kpiPBR"
                                                  th:text="${#numbers.formatDecimal(brcValues[4].pbr ?: null, 1, 2)} ?: '--배'">
@@ -838,7 +959,7 @@
                                     </div>
 
                                     <div class="col-6 col-lg-4">
-                                        <div class="risk-kpi" aria-label="EV/Sales">
+                                        <div aria-label="EV/Sales" class="risk-kpi">
                                             <div class="risk-kpi-label">EV/Sales</div>
                                             <div class="risk-kpi-value" id="kpiEVS"
                                                  th:text="${#numbers.formatDecimal(brcValues[4].evSales ?: null, 1, 2)} ?: '--배'">
@@ -848,7 +969,7 @@
                                     </div>
 
                                     <div class="col-6 col-lg-4">
-                                        <div class="risk-kpi" aria-label="EV/EBITDA">
+                                        <div aria-label="EV/EBITDA" class="risk-kpi">
                                             <div class="risk-kpi-label">EV/EBITDA</div>
                                             <div class="risk-kpi-value" id="kpiEVEBITDA"
                                                  th:text="${#numbers.formatDecimal(brcValues[4].evEbitda ?: null, 1, 2)} ?: '--배'">
@@ -858,7 +979,7 @@
                                     </div>
 
                                     <div class="col-6 col-lg-4">
-                                        <div class="risk-kpi" aria-label="EV/EBIT">
+                                        <div aria-label="EV/EBIT" class="risk-kpi">
                                             <div class="risk-kpi-label">EV/EBIT</div>
                                             <div class="risk-kpi-value" id="kpiEVEBIT"
                                                  th:text="${#numbers.formatDecimal(brcValues[4].evEbit ?: null, 1, 2)} ?: '--배'">
@@ -871,20 +992,20 @@
                         </section>
 
                         <div class="d-flex flex-wrap gap-2 justify-content-end align-items-center mb-2 mt-3">
-                            <select id="pnlRange" class="form-select form-select-sm" style="max-width:160px">
-                                <option value="12" selected>최근 12개월</option>
+                            <select class="form-select form-select-sm" id="pnlRange" style="max-width:160px">
+                                <option selected value="12">최근 12개월</option>
                                 <option value="24">최근 24개월</option>
                                 <option value="36">최근 36개월</option>
                                 <option value="all">전체</option>
                             </select>
-                            <div class="btn-group btn-group-sm" role="group" aria-label="표시 단위">
-                                <button id="pnlModeCum" type="button" class="btn btn-outline-secondary active">누적
+                            <div aria-label="표시 단위" class="btn-group btn-group-sm" role="group">
+                                <button class="btn btn-outline-secondary active" id="pnlModeCum" type="button">누적
                                 </button>
-                                <button id="pnlModePer" type="button" class="btn btn-outline-secondary">기간</button>
+                                <button class="btn btn-outline-secondary" id="pnlModePer" type="button">기간</button>
                             </div>
-                            <button id="pnlExportPng" type="button" class="btn btn-sm btn-outline-secondary">PNG 내보내기
+                            <button class="btn btn-sm btn-outline-secondary" id="pnlExportPng" type="button">PNG 내보내기
                             </button>
-                            <button id="pnlResetZoom" type="button" class="btn btn-sm btn-outline-secondary">줌 리셋
+                            <button class="btn btn-sm btn-outline-secondary" id="pnlResetZoom" type="button">줌 리셋
                             </button>
                         </div>
                         <section class="mini-card mt-3">
@@ -892,7 +1013,7 @@
                                 <h3 class="mini-card-title mb-0">연도별 핵심지표흐름</h3>
                             </div>
                             <div class="mini-card-body h-320">
-                                <canvas id="pnlCurveChart" aria-label="누적 손익 차트" role="img"></canvas>
+                                <canvas aria-label="누적 손익 차트" id="pnlCurveChart" role="img"></canvas>
                             </div>
                         </section>
                     </div>
@@ -905,19 +1026,19 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="input-group input-group-sm" style="min-width:160px; max-width:200px;">
                                         <span class="input-group-text">리스크</span>
-                                        <select id="stratRisk" class="form-select">
+                                        <select class="form-select" id="stratRisk">
                                             <option value="conservative">보수적</option>
-                                            <option value="moderate" selected>중립</option>
+                                            <option selected value="moderate">중립</option>
                                             <option value="aggressive">공격적</option>
                                         </select>
                                     </div>
-                                    <div class="btn-group btn-group-sm strategy-actions flex-nowrap" role="group"
-                                         aria-label="전략 실행 버튼">
-                                        <button id="btnGenStrategy" type="button" class="btn btn-primary">전략 생성</button>
-                                        <button id="btnRiskAudit" type="button" class="btn btn-outline-secondary">리스크
+                                    <div aria-label="전략 실행 버튼" class="btn-group btn-group-sm strategy-actions flex-nowrap"
+                                         role="group">
+                                        <button class="btn btn-primary" id="btnGenStrategy" type="button">전략 생성</button>
+                                        <button class="btn btn-outline-secondary" id="btnRiskAudit" type="button">리스크
                                             점검
                                         </button>
-                                        <button id="btnRebalance" type="button" class="btn btn-outline-secondary">리밸런싱
+                                        <button class="btn btn-outline-secondary" id="btnRebalance" type="button">리밸런싱
                                             제안
                                         </button>
                                     </div>
@@ -929,119 +1050,108 @@
                                     <!-- ▼▼▼ 전략 옵션 UI: 프롬프트 인풋 아래에 추가 ▼▼▼ -->
 
                                     <div class="dropdown" data-bs-auto-close="outside">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
-                                                data-bs-toggle="dropdown" aria-expanded="false" id="stratKindsBtn">
+                                        <button aria-expanded="false" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                data-bs-toggle="dropdown" id="stratKindsBtn" type="button">
                                             전략유형 선택
                                         </button>
 
                                         <div class="dropdown-menu p-2"
-                                             style="min-width:240px; max-height:240px; overflow:auto"
-                                             id="stratKindsMenu">
+                                             id="stratKindsMenu"
+                                             style="min-width:240px; max-height:240px; overflow:auto">
                                             <!-- 카테고리로 그룹핑(선택) -->
                                             <div class="text-muted small px-2 pb-1">자산 배분</div>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="barbell"
-                                                       name="stratKinds[]"> 바벨
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="barbell"> 바벨
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="balanced"
-                                                       name="stratKinds[]"> 균형형
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="balanced"> 균형형
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="riskParity"
-                                                       name="stratKinds[]"> 리스크 패리티
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="riskParity"> 리스크 패리티
                                             </label>
                                             <div class="text-muted small px-2 pt-2 pb-1 border-top">스타일/팩터</div>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="aggressive"
-                                                       name="stratKinds[]"> 공격적
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="aggressive"> 공격적
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="defensive"
-                                                       name="stratKinds[]"> 방어적
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="defensive"> 방어적
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="value"
-                                                       name="stratKinds[]"> 가치
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="value"> 가치
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="growth"
-                                                       name="stratKinds[]"> 성장
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="growth"> 성장
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="dividend"
-                                                       name="stratKinds[]"> 배당
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="dividend"> 배당
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="momentum"
-                                                       name="stratKinds[]"> 모멘텀
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="momentum"> 모멘텀
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="quality"
-                                                       name="stratKinds[]"> 퀄리티
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="quality"> 퀄리티
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1"
-                                                       value="dualMomentum" name="stratKinds[]"> 듀얼 모멘텀
+                                                <input class="form-check-input me-1" name="stratKinds[]"
+                                                       type="checkbox" value="dualMomentum"> 듀얼 모멘텀
                                             </label>
                                             <label class="dropdown-item d-flex align-items-center gap-2">
-                                                <input type="checkbox" class="form-check-input me-1" value="hedged"
-                                                       name="stratKinds[]"> 헤지
+                                                <input class="form-check-input me-1" name="stratKinds[]" type="checkbox"
+                                                       value="hedged"> 헤지
                                             </label>
 
                                             <div class="d-flex gap-2 mt-2 px-2">
-                                                <button type="button" class="btn btn-sm btn-light" id="kindsClear">초기화
+                                                <button class="btn btn-sm btn-light" id="kindsClear" type="button">초기화
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-primary ms-auto"
-                                                        data-bs-toggle="dropdown">확인
+                                                <button class="btn btn-sm btn-primary ms-auto" data-bs-toggle="dropdown"
+                                                        type="button">확인
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div id="kindsPills" class="ms-2 d-flex flex-wrap gap-1"></div>
+                                    <div class="ms-2 d-flex flex-wrap gap-1" id="kindsPills"></div>
                                 </div>
                                 <!-- ▲▲▲ 전략 옵션 UI: 여기까지 ▲▲▲ -->
-
-                                <div class="prompt-row mt-2">
-                                    <div class="input-group input-group-sm">
-                                        <span class="input-group-text">프롬프트</span>
-                                        <input id="stratPrompt" type="text" class="form-control"
-                                               placeholder="예: 예대율 개선 및 리스크 축소 전략"
-                                               aria-label="전략 프롬프트">
-                                    </div>
-                                </div>
 
                             </div>
 
                         </section>
                         <!-- 전략생성옵션모음 끝 -->
-                        <section class="mini-card flex-grow-1 d-flex flex-column" style="min-height:0">
+                        <section class="mini-card mt-3">
                             <div class="mini-card-header">
-                                <h3 class="mini-card-title mb-0">전략 결과</h3>
-                                <div class="btn-group btn-group-sm" role="group" aria-label="결과 패널 도구">
-                                    <button id="btnCopyGenai" type="button" class="btn btn-outline-secondary">복사
-                                    </button>
-                                    <button id="btnClearGenai" type="button" class="btn btn-outline-secondary">비우기
-                                    </button>
-                                </div>
+                                <h3 class="mini-card-title mb-0">생성형 AI 분석</h3>
                             </div>
-                            <div class="mini-card-body flex-grow-1" style="overflow:auto; min-height:240px">
-                                <div id="genaiOutput" class="small" style="white-space:pre-wrap" role="status"
-                                     aria-live="polite">
-                                    버튼을 눌러 전략을 생성하면 이 영역에 결과가 표시됩니다.
+                            <div class="mini-card-body">
+                                <div class="input-row mb-2">
+                                    <textarea class="form-control" id="prompt" placeholder="예) 현재 사무소 재무비율 분석해줘" rows="3">
+                                    </textarea>
+                                    <button class="btn btn-primary" id="sendBtn">보내기</button>
                                 </div>
+                                <div class="d-flex justify-content-between small text-muted mb-2">
+                                    <span>Enter=전송 / Shift+Enter=줄바꿈</span>
+                                </div>
+                                <div class="log border rounded p-2" id="log" style="max-height:300px; overflow-y:auto; background:#fcfcfd"></div>
                             </div>
                         </section>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </main>
 
 <footer>© <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> D.N.A 1조</footer>
-<div class="toast-container" aria-live="polite" aria-atomic="true"></div>
+<div aria-atomic="true" aria-live="polite" class="toast-container"></div>
 
 <!-- Inline App Script -->
 <script th:inline="javascript">
@@ -1908,23 +2018,23 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    interaction: { intersect: false, mode: 'index' },
+                    interaction: {intersect: false, mode: 'index'},
                     plugins: {
-                        legend: { position: 'bottom' }
+                        legend: {position: 'bottom'}
                     },
                     scales: {
                         yLeft: {
                             type: 'linear',
                             position: 'left',
                             beginAtZero: true,
-                            title: { display: true, text: 'PER / EV Ratios' },
+                            title: {display: true, text: 'PER / EV Ratios'},
                         },
                         yRight: {
                             type: 'linear',
                             position: 'right',
                             beginAtZero: true,
-                            title: { display: true, text: 'PBR' },
-                            grid: { drawOnChartArea: false }
+                            title: {display: true, text: 'PBR'},
+                            grid: {drawOnChartArea: false}
                         }
                     }
                 }
@@ -2164,6 +2274,44 @@
     </span>`).join('');
         }
 
+        function clearStrategyOptionsUI() {
+            // 1) 전략유형 체크박스 해제
+            const menu = document.getElementById('stratKindsMenu');
+            if (menu) {
+                menu.querySelectorAll('input[name="stratKinds[]"]').forEach(i => i.checked = false);
+                // 버튼 라벨/뱃지 갱신 트리거
+                menu.dispatchEvent(new Event('change'));
+            }
+
+            // 2) 선택 뱃지 비우기
+            const pills = document.getElementById('kindsPills');
+            if (pills) pills.innerHTML = '';
+
+            // 3) 리스크 기본값으로
+            const risk = document.getElementById('stratRisk');
+            if (risk) risk.value = 'moderate';
+        }
+
+// 버튼 클릭 바인딩
+        document.getElementById('btnClearStrategyOptions')?.addEventListener('click', () => {
+            clearStrategyOptionsUI();
+
+            // (옵션) 알림 토스트
+            try {
+                const tc = document.querySelector('.toast-container');
+                if (tc) {
+                    const t = document.createElement('div');
+                    t.className = 'toast align-items-center text-bg-secondary border-0 show';
+                    t.innerHTML = `<div class='d-flex'><div class='toast-body'>전략 옵션을 초기화했어요.</div>
+        <button type='button' class='btn-close btn-close-white me-2 m-auto' data-bs-dismiss='toast'></button></div>`;
+                    tc.appendChild(t);
+                    setTimeout(() => { t.classList.replace('show','hide'); setTimeout(() => t.remove(), 300); }, 1400);
+
+                }
+
+            } catch (_) {}
+        });
+
         document.getElementById('stratKindsMenu')?.addEventListener('change', renderPills);
         pills?.addEventListener('click', (e) => {
             const kind = e.target?.dataset?.kind;
@@ -2206,6 +2354,12 @@
             moderate: {targetVol: '8~12%', maxDrawdown: '<=20%', turnover: 'mid'},
             aggressive: {targetVol: '12~18%', maxDrawdown: '<=35%', turnover: 'mid~high'}
         };
+
+        // IIFE 끝부분에 추가 (전역으로 노출)
+        window.getSelectedKinds    = getSelectedKinds;
+        window.STRATEGY_TEMPLATES  = STRATEGY_TEMPLATES;
+        window.RISK_PROFILE_HINT   = RISK_PROFILE_HINT;
+
 
         // ▼ 사람이 읽기 좋은 “요약 프롬프트” 생성 (선택한 옵션을 자연어로 합성)
         function buildNaturalPrompt({prompt, kinds, risk, horizon, mode}) {
@@ -2318,7 +2472,284 @@
         console.log('strategy:rebalance payload', e.detail);
         // TODO
     });
+    const $prompt  = document.getElementById('prompt');
+    const $log     = document.getElementById('log');
+    const $btn     = document.getElementById('sendBtn');
+    const $office  = document.getElementById('officeCode');
+    const $ctxInfo = document.getElementById('ctxInfo');
 
+    // URL ?brc=123456 있으면 officeCode에 자동 세팅
+    (function initBrcFromUrl(){
+        const sp = new URLSearchParams(location.search);
+        const urlBrc = (sp.get('brc') || '').trim();
+        if (urlBrc && $office) {
+            $office.value = urlBrc.slice(0, 6).replace(/\D/g, '');
+        }
+    })();
+
+    // ===== Chat helpers (define once, before append) =====
+    window.escapeHtml = function(s=''){
+        return s
+            .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+            .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    };
+    window.linkify = function(s=''){
+        return s.replace(/\bhttps?:\/\/[^\s<>()]+/g,
+            url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+    };
+    window.formatBlocks = function(s=''){
+        s = s.replace(/```([\s\S]*?)```/g, (_, code) =>
+            `<pre><code>${window.escapeHtml(code.trim())}</code></pre>`);
+        s = s.replace(/`([^`]+?)`/g, (_, code) =>
+            `<code>${window.escapeHtml(code)}</code>`);
+        return s;
+    };
+    window.maybeClamp = function(html){
+        const MAX_LEN = 1600; // 길면 '더 보기' 토글
+        if(html.length <= MAX_LEN) return html;
+        const head = html.slice(0,MAX_LEN), tail = html.slice(MAX_LEN);
+        const id = 'sx_'+Math.random().toString(36).slice(2);
+        return `
+    <span>${head}</span>
+    <span id="${id}" style="display:none">${tail}</span>
+    <a class="show-more" onclick="
+      const h=document.getElementById('${id}');
+      if(h.style.display==='none'){ this.textContent='간단히'; h.style.display='inline'; }
+      else{ this.textContent='더 보기'; h.style.display='none'; }
+    ">더 보기</a>`;
+    };
+    function setCtxInfo(state, detail={}){
+        const el = window.$ctxInfo;
+        if(!el) return;
+
+        if(state === 'loading'){
+            const { brc, years } = detail;
+            el.textContent = `컨텍스트 불러오는 중… (brc ${brc} · 최근 ${years}개년)`;
+            el.classList.remove('text-danger','text-success');
+        } else if(state === 'ok'){
+            const { brc, years, bytes } = detail;
+            el.textContent = `컨텍스트 연결됨 · ${bytes?.toLocaleString?.() ?? bytes}B · brc ${brc} · ${years}개년`;
+            el.classList.remove('text-danger');
+            el.classList.add('text-success');
+        } else if(state === 'fail'){
+            const { message } = detail;
+            el.textContent = `컨텍스트 없음(서버 응답 실패)${message ? ' · ' + message : ''}`;
+            el.classList.remove('text-success');
+            el.classList.add('text-danger');
+        } else if(state === 'idle'){
+            el.textContent = '컨텍스트 준비 중…';
+            el.classList.remove('text-danger','text-success');
+        }
+    }
+
+    function nowHHMM(){
+        const d=new Date(); return d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+    }
+    function append(role, text){
+        const row = document.createElement('div');
+        row.className = 'msg ' + (role || 'assistant');
+
+        const av = document.createElement('div');
+        av.className = 'avatar';
+        av.textContent = role==='user' ? '👤' : role==='system' ? '⚙' : '🤖';
+
+        const bb = document.createElement('div');
+        bb.className = 'bubble';
+
+        const safe = window.escapeHtml(text || '');
+        const html = window.maybeClamp(window.linkify(window.formatBlocks(safe)));
+
+        bb.innerHTML = `${html} <span class="meta">· ${nowHHMM()}</span>`;
+
+        if(role==='user'){ row.appendChild(bb); row.appendChild(av); }
+        else{ row.appendChild(av); row.appendChild(bb); }
+
+        $log.appendChild(row);
+        $log.scrollTop = $log.scrollHeight;
+    }
+
+    function getBrc(){
+        const v = ($office?.value || '').trim();
+        return (v && /^\d{6}$/.test(v)) ? v : '707015';
+    }
+
+    async function fetchFinContext(brc, years=5){
+        const url = `/api/finratio/serving/context?brc=${encodeURIComponent(brc)}&years=${years}`;
+        const res = await fetch(url);
+        if(!res.ok) throw new Error(`컨텍스트 조회 실패: ${res.status}`);
+        return await res.text();
+    }
+
+    // 전략 옵션을 한 번에 수집해서 JSON으로 만들기
+    function buildStrategyOptions() {
+        const kinds = (typeof getSelectedKinds === 'function') ? getSelectedKinds() : [];
+        const riskEl = document.getElementById('stratRisk');
+        const risk = riskEl?.value || 'moderate';
+        const horizon = document.getElementById('pnlRange')?.value || '12';
+        const mode = document.getElementById('pnlModePer')?.classList.contains('active') ? 'per' : 'cum';
+
+        let naturalPrompt = "";
+        try {
+            // 사용자가 프롬프트를 비워도 ""가 들어가도록(빈 상태 유지)
+            naturalPrompt = (typeof buildNaturalPrompt === 'function')
+                ? (buildNaturalPrompt({
+                    prompt: (document.getElementById('prompt')?.value || '').trim(),
+                    kinds, risk, horizon, mode
+                }) || "")
+                : "";
+        } catch (_) { /* 안전 가드 */ }
+
+        // back-end가 쓰기 좋은 힌트/템플릿도 함께 제공
+        const hints = (typeof RISK_PROFILE_HINT !== 'undefined') ? (RISK_PROFILE_HINT[risk] || {}) : {};
+        const templates = (typeof STRATEGY_TEMPLATES !== 'undefined')
+            ? kinds.map(k => STRATEGY_TEMPLATES[k] || {label: k})
+            : kinds.map(k => ({label: k}));
+
+        return {
+            kinds,          // []일 수 있음(선택 안 했을 때 그대로 빈 배열)
+            risk,           // 항상 존재(기본 moderate)
+            horizon,        // "12" 등
+            mode,           // "per" | "cum"
+            hints,          // 리스크 가이드 요약
+            templates,      // 선택한 전략 템플릿 메타
+            naturalPrompt   // 사람이 읽기 좋은 요약 (비어있을 수 있음)
+        };
+    }
+
+
+    function collectStrategyOptions() {
+        // 1) 선택값 수집 (전역 노출 실패 대비해 DOM에서 직접 읽기)
+        const kinds = Array.from(document.querySelectorAll('#stratKindsMenu input[name="stratKinds[]"]:checked'))
+            .map(i => i.value);
+        const risk = document.getElementById('stratRisk')?.value || 'moderate';
+        const horizon = document.getElementById('pnlRange')?.value || '12';
+        const mode = document.getElementById('pnlModePer')?.classList.contains('active') ? 'per' : 'cum';
+
+        // 2) 전역 매핑(없어도 안전)
+        const hints = (window.RISK_PROFILE_HINT?.[risk]) || {};
+        const templates = (window.STRATEGY_TEMPLATES)
+            ? kinds.map(k => window.STRATEGY_TEMPLATES[k] || {label: k})
+            : kinds.map(k => ({label: k}));
+
+        // 3) 자연어 요약(NOTE: 없는 경우 빈 문자열)
+        const labels = (window.STRATEGY_TEMPLATES)
+            ? kinds.map(k => window.STRATEGY_TEMPLATES[k]?.label || k)
+            : kinds;
+        const riskKo = {conservative:'보수적', moderate:'중립', aggressive:'공격적'}[risk] || risk;
+        const naturalPrompt = [
+            labels.length ? `요청 전략: ${labels.join(', ')} (${riskKo})` : '',
+            `분석 구간: ${horizon==='all'?'전체':horizon+'개월'} / 표시단위: ${mode==='per'?'기간':'누적'}`,
+            (hints && (hints.targetVol || hints.maxDrawdown || hints.turnover))
+                ? `리스크 가이드: 변동성 ${hints.targetVol||'-'}, MDD ${hints.maxDrawdown||'-'}, 회전율 ${hints.turnover||'-'}`
+                : ''
+        ].filter(Boolean).join('\n');
+
+        return { kinds, risk, horizon, mode, hints, templates, naturalPrompt };
+    }
+
+    async function buildMergedPromptAsync(userPrompt){
+        const brc = getBrc();
+        const years = 5;
+
+        // 전략 옵션 섹션 생성
+        let stratSection = "";
+        if (!skipStrategyOptions) {
+            const strat = collectStrategyOptions();
+            const stratJson = JSON.stringify(strat, null, 2);
+            stratSection = `
+
+[strategy_options.json]
+${stratJson}`;
+        } else {
+            skipStrategyOptions = false; // 한 번만 생략
+        }
+
+        // 컨텍스트 가져오기 + 상태표시 갱신
+        try {
+            setCtxInfo('loading', { brc, years });
+
+            const ctx = await fetchFinContext(brc, years);
+            const bytes = (typeof ctx === 'string') ? ctx.length : new Blob([ctx]).size;
+
+            setCtxInfo('ok', { brc, years, bytes });
+
+            return `[client_vars]
+brc: ${brc}
+years: ${years}
+
+[fin_ratio_serving]
+${ctx}${stratSection}
+
+[user_question]
+${userPrompt}`;
+        } catch(e) {
+            setCtxInfo('fail', { message: e?.message });
+
+            // 컨텍스트 없을 때도 질문은 진행
+            return `[client_vars]
+brc: ${brc}${stratSection}
+
+[user_question]
+${userPrompt}`;
+        }
+    }
+
+
+
+
+    // Enter로 전송 (Shift+Enter는 줄바꿈)
+    $prompt.addEventListener('keydown',(e)=>{
+        if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); $btn.click(); }
+    });
+
+    $btn.addEventListener('click', async ()=>{
+        const prompt = $prompt.value.trim();
+        if(!prompt) return;
+        append('user', prompt);
+        $btn.disabled = true; const old = $btn.textContent; $btn.textContent='생각 중…';
+
+        try{
+            const mergedPrompt = await buildMergedPromptAsync(prompt);
+            console.log("최종 mergedPrompt:", mergedPrompt);
+            const res = await fetch('/api/ai/ask', {
+                method:'POST', headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ prompt: mergedPrompt })
+            });
+            if(!res.ok){
+                const t = await res.text();
+                append('assistant', `오류: ${res.status} ${res.statusText}\n${t}`);
+            }else{
+                const data = await res.json();
+                append('assistant', data?.answer || '(빈 응답)');
+            }
+        }catch(e){
+            append('assistant', '네트워크 오류: ' + e.message);
+        }finally{
+            $btn.disabled=false; $btn.textContent=old; $prompt.focus();
+        }
+    });
+    // === [추가] 전략 액션 버튼 색상(활성) 토글 ===
+    (function attachStrategyActiveToggle() {
+        const ids = ['btnGenStrategy', 'btnRiskAudit', 'btnRebalance'];
+        const btns = ids.map(id => document.getElementById(id)).filter(Boolean);
+
+        function activate(btn) {
+            btns.forEach(b => {
+                if (!b) return;
+                // 모두 기본(회색)으로
+                b.classList.remove('btn-primary');
+                b.classList.add('btn-outline-secondary');
+            });
+            // 클릭한 것만 파란색으로
+            btn.classList.remove('btn-outline-secondary');
+            btn.classList.add('btn-primary');
+        }
+
+        btns.forEach(b => {
+            if (!b) return;
+            b.addEventListener('click', () => activate(b));
+        });
+    })();
 </script>
 
 
