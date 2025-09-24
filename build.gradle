@@ -38,8 +38,5 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation 'com.openai:openai-java:3.5.2'
     implementation 'com.openai:openai-java-spring-boot-starter:3.5.2'
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 }

@@ -785,13 +785,9 @@
                         <tbody>
                         <!-- ========== 수익성 비율 ========== -->
                         <tr>
-                            <td rowspan="7">수익성 비율</td>
+                            <td rowspan="6">수익성 비율</td>
                             <td>순이자마진(%)</td>
                             <td th:each="y : ${years}" th:text="${(fr.get(y)?.netInterestMarginPct) ?: '—'}">—</td>
-                        </tr>
-                        <tr>
-                            <td>세전순이익률(%)</td>
-                            <td th:each="y : ${years}" th:text="${(fr.get(y)?.preTaxProfitMarginPct) ?: '—'}">—</td>
                         </tr>
                         <tr>
                             <td>순이익률(%)</td>
