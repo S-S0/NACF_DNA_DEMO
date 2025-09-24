@@ -6,7 +6,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -18,10 +17,10 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // SHA-256 적용 (보안권고가이드)
+        // 단방향 해시 SHA-256 적용 (보안권고가이드) !! 솔트는 테이블에 저장할때 쓰는거라 여기서 인메모리기때문에 미적용
         return Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
-    // 메모리 사용
+    // 인메모리 사용
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails user = User.builder()
