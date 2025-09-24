@@ -21,7 +21,7 @@ public class SecurityConfig {
         // SHA-256 적용 (보안권고가이드)
         return Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
-
+    // 메모리 사용
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         UserDetails user = User.builder()
@@ -38,6 +38,7 @@ public class SecurityConfig {
 
         return new InMemoryUserDetailsManager(user, admin);
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -50,6 +51,10 @@ public class SecurityConfig {
                         .loginPage("/login") // 로그인 페이지
                         .defaultSuccessUrl("/home", true)
                         .permitAll()
+                )
+                .sessionManagement(s -> s
+                        .maximumSessions(1) // 동시접속 몇개까지 허용할지
+                        .maxSessionsPreventsLogin(false)
                 )
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
