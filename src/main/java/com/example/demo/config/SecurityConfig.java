@@ -24,19 +24,13 @@ public class SecurityConfig {
     // 인메모리 사용
     @Bean
     public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        UserDetails user = User.builder()
-                .username("user")
-                .password(passwordEncoder.encode("1234"))
-                .roles("USER")
-                .build();
-
         UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder.encode("1234"))
+                .username("dna")
+                .password(passwordEncoder.encode("1q2w3e4r!@#%"))
                 .roles("ADMIN")
                 .build();
 
-        return new InMemoryUserDetailsManager(user, admin);
+        return new InMemoryUserDetailsManager(admin);
     }
 
     @Bean
