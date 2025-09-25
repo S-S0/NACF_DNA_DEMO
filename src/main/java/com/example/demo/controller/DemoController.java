@@ -25,11 +25,15 @@ public class DemoController {
         this.demoService = demoService;
         this.service = service;
     }
+
+
     // 로그인 페이지
     @GetMapping("/login")
     public String login() {
         return "login";
     }
+
+
     // 여기가 메인페이지---------------------------------------------------- 가져다가 붙여놓고 한번에 최적화 예정
     @GetMapping({"/", "/home"})
     public String home(@RequestParam(name="brc", required=false) String brc, Model model) {

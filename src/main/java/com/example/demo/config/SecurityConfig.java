@@ -3,6 +3,7 @@ package com.example.demo.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +18,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // 단방향 해시 SHA-256 적용 (보안권고가이드) !! 솔트는 테이블에 저장할때 쓰는거라 여기서 인메모리기때문에 미적용
+        // 단방향 해시 SHA-256 적용 (보안권고가이드) !! 솔트는 기본 적용된 상태
         return Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8();
     }
     // 인메모리 사용
@@ -41,8 +42,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/img/**")
+                        .requestMatchers(
+                                "/login"
+                                , "/css/**"
+                                , "/js/**"
+                                , "/img/**"
+                                , "/api/**"
+                                , "/ask"
+                        )
                         .permitAll() // 로그인, 정적리소스 허용
                         .anyRequest().authenticated()
                 )
@@ -52,7 +61,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .sessionManagement(s -> s
-                        .maximumSessions(1) // 동시접속 몇개까지 허용할지
+                        .maximumSessions(1) // 동시접속 몇개까지 허용할지 -> 한개
                         .maxSessionsPreventsLogin(false)
                 )
                 .logout(logout -> logout
