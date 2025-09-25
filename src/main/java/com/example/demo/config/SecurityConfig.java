@@ -51,6 +51,7 @@ public class SecurityConfig {
                                 , "/img/**"
                                 , "/api/**"
                                 , "/ask"
+                                , "/context"
                         )
                         .permitAll() // 로그인, 정적리소스 허용
                         .anyRequest().authenticated()
