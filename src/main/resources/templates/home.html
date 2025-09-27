@@ -588,8 +588,7 @@
            oninput="if(this.value.length>6)this.value=this.value.slice(0,6);" pattern="[0-9]*" placeholder="6자리 숫자"
            style="max-width:150px"
            type="number">
-    <small class="text-muted ms-1" id="officeHelp">숫자 6자리</small>
-    <button class="btn btn-sm btn-primary" type="button">확인</button>
+    <button class="btn btn-sm btn-primary" id="btnOfficeGo" type="button">확인</button>
 </div>
 
 <main class="container-fluid py-2">
@@ -2372,15 +2371,6 @@
     const $btn = document.getElementById('sendBtn');
     const $office = document.getElementById('officeCode');
 
-    // URL ?brc=123456 있으면 officeCode에 자동 세팅
-    (function initBrcFromUrl() {
-        const sp = new URLSearchParams(location.search);
-        const urlBrc = (sp.get('brc') || '').trim();
-        if (urlBrc && $office) {
-            $office.value = urlBrc.slice(0, 6).replace(/\D/g, '');
-        }
-    })();
-
     // ===== Chat helpers (define once, before append) =====
     window.escapeHtml = function (s = '') {
         return s
@@ -2632,6 +2622,46 @@ ${userPrompt}`;
         });
 
         setActionGuide('generate');
+    })();
+
+    // === 사무소코드 이동 ===
+    (function officeGoWiring(){
+        const $office = document.getElementById('officeCode');
+        const $go = document.getElementById('btnOfficeGo');
+
+        function goWithOfficeCode(){
+            const code = ($office?.value || '').replace(/\D/g,'').slice(0,6);
+            if (!/^\d{6}$/.test(code)) {
+                // 간단 경고(토스트가 있으면 토스트 쓰셔도 됨)
+                alert('사무소코드는 6자리 숫자여야 합니다.');
+                $office?.focus();
+                return;
+            }
+            const url = new URL(location.href);
+            url.searchParams.set('brc', code);
+            // 새 페이지 로드(서버가 ?brc=... 기준으로 데이터 바인딩)
+            location.href = url.toString();
+        }
+
+        $go?.addEventListener('click', goWithOfficeCode);
+        // 입력칸에서 Enter로도 수행
+        $office?.addEventListener('keydown', (e)=>{
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                goWithOfficeCode();
+            }
+        });
+    })();
+    // === 새로 로드된 페이지에서는 입력칸 비우고, 주소창에서 ?brc 제거 ===
+    (function clearOfficeAfterLoad(){
+        const $office = document.getElementById('officeCode');
+        const sp = new URLSearchParams(location.search);
+        if (sp.has('brc')) {
+            // 서버는 이미 ?brc로 렌더 완료 → UI는 비워서 깔끔하게
+            if ($office) $office.value = '';
+            // 주소창도 정리 (?brc 제거)
+            history.replaceState(null, '', location.pathname);
+        }
     })();
 </script>
 

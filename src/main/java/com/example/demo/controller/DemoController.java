@@ -7,8 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Arrays;
@@ -42,7 +40,7 @@ public class DemoController {
         model.addAttribute("pageTitle", "NH 손익위험관리 및 AI 경영전략 생성시스템");
 
         // 사무소코드가 없을 경우 기본 방어로직 - 안동농협?
-        if(brc == null) {
+        if (brc == null || !( "100158".equals(brc) || "707015".equals(brc) || "801819".equals(brc) )) {
             brc = "707015";
         }
 
