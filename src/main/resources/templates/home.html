@@ -2632,7 +2632,7 @@ ${userPrompt}`;
         function goWithOfficeCode(){
             const code = ($office?.value || '').replace(/\D/g,'').slice(0,6);
             if (!/^\d{6}$/.test(code)) {
-                // 간단 경고(토스트가 있으면 토스트 쓰셔도 됨)
+                // 간단 경고
                 alert('사무소코드는 6자리 숫자여야 합니다.');
                 $office?.focus();
                 return;
